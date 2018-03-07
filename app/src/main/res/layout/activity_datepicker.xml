@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradiant">
+
+    <RelativeLayout
+        android:layout_above="@+id/buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <DatePicker
+        android:id="@+id/datepicker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:calendarViewShown="false"
+        android:datePickerMode="spinner"
+        ></DatePicker>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/buttons"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="164dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="17dp"
+        >
+        <Button
+            android:id="@+id/button_back"
+            android:layout_width="99.33dp"
+            android:layout_height="37dp"
+            android:letterSpacing="0.2"
+            android:paddingTop="0.33dp"
+            android:background="@drawable/buttonshape"
+            android:layout_toLeftOf="@+id/centerimage"
+            android:text="BACK"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@color/colorWhite"
+            android:textSize="13.33dp" />
+        <ImageView
+            android:id="@+id/centerimage"
+            android:layout_width="21.33dp"
+            android:layout_height="37dp"
+            android:layout_centerHorizontal="true"/>
+
+        <Button
+            android:id="@+id/button_save"
+            android:letterSpacing="0.2"
+            android:paddingTop="0.33dp"
+            android:layout_toRightOf="@+id/centerimage"
+            android:layout_width="99.33dp"
+            android:layout_height="37dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/buttonshape"
+            android:text="SAVE"
+            android:textColor="@color/colorWhite"
+            android:textSize="13.33dp" />
+    </RelativeLayout>
+
+</RelativeLayout>

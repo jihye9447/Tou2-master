@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradiant">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/birthday"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_marginTop="250dp"
+        android:layout_marginBottom="22.24dp"
+        android:gravity="center_horizontal"
+        android:layout_gravity="center"
+        android:letterSpacing="0.2"
+        android:text="  생일 알려주세요. "
+        android:textColor="@color/colorWhite"
+        android:textSize="16dp" />
+
+    <Button
+        android:id="@+id/birthday_edit"
+        android:layout_width="239.67dp"
+        android:paddingTop="0.33dp"
+        android:layout_height="37dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/edittextshape"
+        android:gravity="center"
+        android:onClick="datePicker"
+        android:padding="10dp"
+        android:paddingLeft="15dp"
+        android:hint="생일을 입력하세요."
+        android:textColorHint="@color/colorHint"
+        android:textColor="@color/colorWhite"
+        android:letterSpacing="0.2"
+        android:textSize="13dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/birthday_edit"
+            android:layout_marginTop="17dp"
+            >
+    <Button
+        android:id="@+id/button-reset"
+        android:layout_width="99.33dp"
+        android:layout_height="37dp"
+        android:layout_toLeftOf="@+id/centerimage"
+        android:background="@drawable/buttonshape"
+        android:text="RESET"
+        android:paddingTop="0.33dp"
+        android:layout_gravity="center_horizontal"
+        android:letterSpacing="0.2"
+        android:textColor="@color/colorWhite"
+        android:textSize="13.33dp" />
+            <ImageView
+                android:id="@+id/centerimage"
+                android:layout_width="21.33dp"
+                android:layout_height="37dp"
+                android:layout_centerHorizontal="true"/>
+
+
+    <Button
+        android:id="@+id/button-next"
+        android:layout_toRightOf="@+id/centerimage"
+        android:layout_width="99.33dp"
+        android:layout_height="37dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/buttonshape"
+        android:text="NEXT"
+        android:paddingTop="0.33dp"
+        android:letterSpacing="0.2"
+        android:textColor="@color/colorWhite"
+        android:textSize="13.33dp" />
+
+</RelativeLayout>
+    </LinearLayout>
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/logo_design"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="33.33dp"
+        android:letterSpacing="0.2"
+        android:text="TOU"
+        android:gravity="center_horizontal"
+        android:textColor="@color/colorWhite"
+        android:textSize="13.33dp"/>
+
+</RelativeLayout>

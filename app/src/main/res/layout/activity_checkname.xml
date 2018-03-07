@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradiant"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/name1"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_marginBottom="22.24dp"
+        android:layout_marginTop="250dp"
+        android:letterSpacing="0.2"
+        android:text="이름이 뭐에요?"
+        android:gravity="center_horizontal"
+        android:textColor="@color/colorWhite"
+        android:textSize="16dp"/>
+
+
+    <TextView
+        android:id="@+id/check_name"
+        android:layout_width="239.67dp"
+        android:layout_height="37dp"
+        android:layout_gravity="center_horizontal"
+        android:maxLines="1"
+        android:gravity="center_horizontal"
+        android:letterSpacing="0.2"
+        android:padding="10dp"
+        android:paddingLeft="15dp"
+        android:singleLine="true"
+        android:background="@drawable/checkedshape"
+        android:textColor="@color/colorWhite"
+        android:shadowColor="@color/colorWhite"
+        android:shadowRadius="10"
+        android:textSize="18.33dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/check_name"
+            android:orientation="horizontal">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="17dp"
+                >
+                <Button
+                    android:id="@+id/button-reset"
+                    android:layout_width="99.33dp"
+                    android:layout_height="37dp"
+                    android:paddingTop="0.33dp"
+                    android:background="@drawable/buttonshape"
+                    android:layout_toLeftOf="@+id/centerimage"
+                    android:text="RESET"
+                    android:letterSpacing="0.2"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="13.33dp" />
+                <ImageView
+                    android:id="@+id/centerimage"
+                    android:layout_width="21.33dp"
+                    android:layout_height="37dp"
+                    android:layout_centerHorizontal="true"/>
+
+                <Button
+                    android:id="@+id/button-next"
+                    android:paddingTop="0.33dp"
+                    android:layout_toRightOf="@+id/centerimage"
+                    android:layout_width="99.33dp"
+                    android:layout_height="37dp"
+                    android:layout_gravity="center_horizontal"
+                    android:letterSpacing="0.2"
+                    android:background="@drawable/buttonshape"
+                    android:text="NEXT"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="13.33dp" />
+            </RelativeLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+        <TextView
+            android:id="@+id/logo_design"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="33.33dp"
+            android:text="TOU"
+            android:letterSpacing="0.2"
+            android:gravity="center_horizontal"
+            android:textColor="@color/colorWhite"
+            android:textSize="13.33dp"/>
+    </RelativeLayout>

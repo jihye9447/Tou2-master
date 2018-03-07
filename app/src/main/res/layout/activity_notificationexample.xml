@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    tools:context="com.tou.MainActivity">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/backgroud"
+        android:scaleType="centerCrop"
+        tools:background="@drawable/background1"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="36dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:id="@+id/linearLayout">
+
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="16dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_horizontal"
+                tools:src="@drawable/fillingicon" />
+
+            <TextView
+                android:id="@+id/currentdate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                tools:text = "15 MAY"
+                android:layout_marginTop="12.33dp"
+                android:letterSpacing="0.2"
+                android:textColor="@color/colorWhite"
+                android:textSize="10dp"/>
+
+                <ImageView
+                    android:id="@+id/weatherimage"
+                    android:layout_width="85.67dp"
+                    android:layout_height="75dp"
+                    android:layout_marginTop="123dp"
+                    android:layout_gravity="center_horizontal"
+                    tools:src="@drawable/fillingicon" />
+
+                <TextView
+                    android:id="@+id/celcious"
+                    android:letterSpacing="0.2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    tools:text = "14C"
+                    android:textSize="10dp"
+                    android:textColor="@color/colorWhite" />
+
+                <TextView
+                    android:id="@+id/content_upper"
+                    android:letterSpacing="0.2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="15dp"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="16dp" />
+
+                <TextView
+                    android:id="@+id/content_below"
+                    android:letterSpacing="0.2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/linearLayout"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="16dp" />
+        </LinearLayout>
+
+    <Button
+        android:id="@+id/button_touch"
+        android:letterSpacing="0.2"
+        android:layout_width="218dp"
+        android:layout_height="40.67dp"
+        android:layout_marginBottom="33.33dp"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:text="TOUCH"
+        android:layout_marginTop="100dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/buttonshape"
+        android:textColor="@color/colorWhite"
+        android:textSize="13.33dp"
+        android:onClick="onTouch"/>
+
+
+</RelativeLayout>

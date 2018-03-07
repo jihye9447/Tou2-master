@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradiant"
+    android:layout_gravity="center"
+    android:gravity="center"
+    tools:context="com.tou.MainActivity">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="25dp">
+    <TextView
+        android:id="@+id/logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="12.03dp"
+        android:layout_marginBottom="210dp"
+        android:layout_marginStart="111.12dp"
+        android:letterSpacing="0.1"
+        android:text="TOU"
+        android:textColor="@color/colorWhite"
+        android:textSize="13.33dp"
+        />
+
+    <ImageView
+        android:id="@+id/logo_gif"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_above="@+id/logo"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="103.75dp"
+        android:visibility="visible"/>
+    <!--app:srcCompat="@drawable/tou_icon"
+        android:src="@drawable/tou_icon"-->
+        <!--android:scaleType="centerInside"-->
+        <!---->
+
+</RelativeLayout>
+
+</LinearLayout>
