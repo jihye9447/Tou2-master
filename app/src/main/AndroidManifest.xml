@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.tou">
+    package="com.finaltou">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -12,46 +12,44 @@
     <uses-permission android:name="android.permission.PHONE_STATE_STATE" />
     <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE"/>
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/icon_xxhdpi"
         android:label="@string/app_name"
-        android:name=".LockApplication"
+        android:name="com.finaltou.LockApplication"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"
+        <activity android:name="com.finaltou.MainActivity"
             android:windowSoftInputMode="adjustPan"></activity>
-        <activity android:name=".ChecknameActivity"></activity>
-        <activity android:name=".BirthdayActivity"></activity>
-        <activity android:name=".DatepickerActivity"></activity>
-        <activity android:name=".LastActivity"></activity>
+        <activity android:name="com.finaltou.ChecknameActivity"></activity>
+        <activity android:name="com.finaltou.BirthdayActivity"></activity>
+        <activity android:name="com.finaltou.DatepickerActivity"></activity>
+        <activity android:name="com.finaltou.LastActivity"></activity>
         <activity
-            android:name=".NotificationExampleActivity"
+            android:name="com.finaltou.NotificationExampleActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"/>
         <!--로딩페이지-->
-        <activity android:name=".LoadingActivity">
+        <activity android:name="com.finaltou.LoadingActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".utils.LockscreenService" >
+        <service android:name="com.finaltou.utils.LockscreenService" >
         </service>
 
         <service
-            android:name=".utils.LockWindowAccessibilityService"
+            android:name="com.finaltou.utils.LockWindowAccessibilityService"
             android:label="@string/app_name"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
-            <meta-data android:name="android.accessibilityservice" android:resource="@xml/accessibilityservice"/>
         </service>
     </application>
 </manifest>
