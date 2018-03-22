@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.Log;
 
 import com.thirdtou.LockApplication;
@@ -39,9 +41,13 @@ public class LockscreenService extends Service{
         public void onReceive(Context context, Intent intent) {
             if (null != context) {
 
+                Log.d("event123",intent.getAction());
                 if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
                     startLockscreenActivity();
 
+                }else if(intent.getAction().equals(Intent.ACTION_SCREEN_OFF)){
+
+                    destroyActivity();
                 }
 
             }
@@ -52,6 +58,7 @@ public class LockscreenService extends Service{
         if (isStartRecever) {
             IntentFilter filter = new IntentFilter();
             filter.addAction(Intent.ACTION_SCREEN_ON);
+            filter.addAction(Intent.ACTION_SCREEN_OFF);
             registerReceiver(mLockscreenReceiver, filter);
         } else {
             if (null != mLockscreenReceiver) {
@@ -95,7 +102,14 @@ public class LockscreenService extends Service{
         Intent startLockscreenActIntent = new Intent(mContext, NotificationExampleActivity.class);
         startLockscreenActIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(startLockscreenActIntent);
+    }
 
+    private void destroyActivity(){
+        if(LockApplication.activities.size()>0){
+            for(AppCompatActivity activity: LockApplication.activities){
+                activity.finish();
+            }
+        }
     }
 
 }

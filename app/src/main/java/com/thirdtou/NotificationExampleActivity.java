@@ -107,6 +107,8 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notificationexample);
 
+        LockApplication.activities.add(this);
+
         getData();
         showComponet();
         setTypeface();

@@ -13,7 +13,7 @@ public class LockApplication extends Application {
 
     public boolean lockScreenShow=false;
     public int notificationId=1989;
-    static ArrayList<AppCompatActivity> activities = new ArrayList<>();
+    public static ArrayList<AppCompatActivity> activities = new ArrayList<>();
 
     @Override
     public void onCreate() {
