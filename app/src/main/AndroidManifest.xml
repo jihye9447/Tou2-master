@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.finaltou">
+    package="com.thirdtou">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -15,36 +15,37 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/icon_xxhdpi"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name="com.finaltou.LockApplication"
+        android:name="com.thirdtou.LockApplication"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.finaltou.MainActivity"
+        <activity android:name="com.thirdtou.MainActivity"
             android:windowSoftInputMode="adjustPan"></activity>
-        <activity android:name="com.finaltou.ChecknameActivity"></activity>
-        <activity android:name="com.finaltou.BirthdayActivity"></activity>
-        <activity android:name="com.finaltou.DatepickerActivity"></activity>
-        <activity android:name="com.finaltou.LastActivity"></activity>
+        <activity android:name="com.thirdtou.ChecknameActivity"></activity>
+        <activity android:name="com.thirdtou.BirthdayActivity"></activity>
+        <activity android:name="com.thirdtou.DatepickerActivity"></activity>
+        <activity android:name="com.thirdtou.LastActivity"></activity>
         <activity
-            android:name="com.finaltou.NotificationExampleActivity"
+            android:name="com.thirdtou.NotificationExampleActivity"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"/>
         <!--로딩페이지-->
-        <activity android:name="com.finaltou.LoadingActivity">
+        <activity android:name="com.thirdtou.LoadingActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="com.finaltou.utils.LockscreenService" >
+        <service android:name="com.thirdtou.utils.LockscreenService" >
         </service>
 
+        <service android:name="com.thirdtou.GPSTracker"/>
         <service
-            android:name="com.finaltou.utils.LockWindowAccessibilityService"
+            android:name="com.thirdtou.utils.LockWindowAccessibilityService"
             android:label="@string/app_name"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
