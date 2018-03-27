@@ -1,8 +1,12 @@
 package com.thirdtou.utils;
 
+import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.app.Service;
+import android.app.admin.DeviceAdminReceiver;
+import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -13,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.Log;
 
+import com.thirdtou.ChecknameActivity;
 import com.thirdtou.LockApplication;
 import com.thirdtou.NotificationExampleActivity;
 import com.thirdtou.SharedPreference;
@@ -27,6 +32,12 @@ import java.util.concurrent.locks.Lock;
  */
 
 public class LockscreenService extends Service{
+
+    //device lock 위한 변수
+    public static final int RESULT_ENABLE = 11;
+    private DevicePolicyManager devicePolicyManager;
+    private ActivityManager activityManager;
+    private ComponentName compName;
 
     Timer lock_timer = new Timer();
     TimerTask lock_timerTask;
@@ -45,6 +56,10 @@ public class LockscreenService extends Service{
     int count=0;
     SharedPreference sharedPreference = new SharedPreference();
     private NotificationManager mNM;
+
+    //lockscreen 하기 위한 componentName 선언
+    /*public DevicePolicyManager mDPM;
+    ComponentName devAdminReceiver;*/
 
     NotiBinder notiBinder = new NotiBinder();
 
@@ -71,17 +86,20 @@ public class LockscreenService extends Service{
                     Log.d("event123","end_time"+String.valueOf(end_time));
                 }
 
+
                 lock_timerTask = new TimerTask() {
                     @Override
                     public void run() {
                         if(LockApplication.activities.size()>0){
                             for(AppCompatActivity activity: LockApplication.activities){
+                                screenLock();
                                 activity.finish();
                             }
                         }
                     }
                 };
                 lock_timer.schedule(lock_timerTask,10*1000);
+
 
                 /*else if(intent.getAction().equals(Intent.ACTION_SCREEN_OFF)){
                     end_time = System.currentTimeMillis();
@@ -95,6 +113,17 @@ public class LockscreenService extends Service{
             }
         }
     };
+    public void screenLock(){
+
+        boolean isActive = devicePolicyManager.isAdminActive(compName);
+        Log.d("event123","isActive: "+ String.valueOf(isActive));
+        //Intent lock_intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+        //lock_intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, compName);
+        if(isActive){
+            devicePolicyManager.lockNow();
+        }
+
+    }
 
     private void stateRecever(boolean isStartRecever) {
         if (isStartRecever) {
@@ -102,6 +131,7 @@ public class LockscreenService extends Service{
             filter.addAction(Intent.ACTION_SCREEN_ON);
             filter.addAction(Intent.ACTION_SCREEN_OFF);
             registerReceiver(mLockscreenReceiver, filter);
+
         } else {
             if (null != mLockscreenReceiver) {
 
@@ -115,6 +145,10 @@ public class LockscreenService extends Service{
         super.onCreate();
         mContext = this;
         mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+
+        devicePolicyManager = (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);
+        //activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        compName= new ComponentName(this, DeviceReceiver.class);
 
     }
 
@@ -137,6 +171,17 @@ public class LockscreenService extends Service{
     public void onDestroy() {
         stateRecever(false);
         mNM.cancel(((LockApplication) getApplication()).notificationId);
+    }
+
+    public void isActiveCheck(){
+
+        boolean isActive = devicePolicyManager.isAdminActive(compName);
+        Intent lock_intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+        lock_intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, compName);
+        startActivity(lock_intent);
+        if(isActive){
+            devicePolicyManager.lockNow();
+        }
     }
 
     private void startLockscreenActivity() {

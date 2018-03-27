@@ -1,7 +1,13 @@
 package com.thirdtou;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.admin.DeviceAdminReceiver;
+import android.app.admin.DevicePolicyManager;
+import android.bluetooth.BluetoothClass;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
@@ -26,6 +32,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.thirdtou.Weather.MinutelyWeather;
+import com.thirdtou.utils.DeviceReceiver;
 import com.thirdtou.utils.LockscreenService;
 import com.thirdtou.utils.RandomNumber;
 
@@ -49,7 +56,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Created by Administrator on 2018-02-27.
  */
 
-public class NotificationExampleActivity extends AppCompatActivity implements View.OnClickListener, ServiceConnection {
+public class NotificationExampleActivity extends AppCompatActivity implements View.OnClickListener, ServiceConnection{
 
 
     //randomNum
@@ -106,6 +113,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
     String[] ranOctImgs;
     String[] ranNovImgs;
     String[] ranSepImgs;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -293,7 +301,9 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
         bindService(new Intent(this, GPSTracker.class), this, BIND_AUTO_CREATE);
         ((LockApplication) getApplication()).lockScreenShow = true;
         bindService(new Intent(this, LockscreenService.class),this,BIND_AUTO_CREATE);
+
     }
+
 
     @Override
     protected void onPause() {
@@ -325,7 +335,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
                     if (object != null) {
                         //데이터가 null이 아니면 날씨 데이터 텍스트 뷰로 보여주기
                         //setCurrent_time();
-                        setBackground(skyCode);
+                         setBackground(skyCode);
                         celcious.setText(temper);
                         setWeatherIcon(skyCode);
 
@@ -600,7 +610,8 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
 
 
     private void setImage(String resource) {
-        Glide.with(this).load(resource).into(background);
+
+         Glide.with(this).load(resource).into(background);
     }
 
     @Override
