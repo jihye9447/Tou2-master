@@ -6,43 +6,33 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.graphics.Typeface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 
 
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.Resource;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.storage.FileDownloadTask;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.thirdtou.Weather.MinutelyWeather;
+import com.thirdtou.utils.LockscreenService;
+import com.thirdtou.utils.RandomNumber;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
@@ -62,6 +52,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class NotificationExampleActivity extends AppCompatActivity implements View.OnClickListener, ServiceConnection {
 
 
+    //randomNum
+    RandomNumber randomNumber = new RandomNumber();
 
 
     //GPSTracker
@@ -102,27 +94,25 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
     int randomNumNov;
     int randomNumSep;
 
+    LockscreenService service;
+
+
+    String[] rainyImgs;
+    String[] ranImgs;
+    String[] ranAugImgs;
+    String[] ranMarchImgs;
+    String[] ranMayImgs;
+    String[] ranJulyImgs;
+    String[] ranOctImgs;
+    String[] ranNovImgs;
+    String[] ranSepImgs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notificationexample);
 
         LockApplication.activities.add(this);
-
-        getData();
-        showComponet();
-        setTypeface();
-        setDate();
-        timeHandler = new TimeHandler(this);
-
-        startRealTimeTimer();
-        setIcon();
-
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    0);
-        }
-
 
     }
 
@@ -152,7 +142,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
 
     public void GPSEvent() {
         if (gps == null) {
-            bindService(new Intent(this,GPSTracker.class),this,BIND_AUTO_CREATE);
+            bindService(new Intent(this, GPSTracker.class), this, BIND_AUTO_CREATE);
         } else {
             gps.Update();
         }
@@ -186,11 +176,9 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
 
         button_touch.setOnClickListener(this);
     }
-
     /**
      *
      */
-
     private void setDate() {
         Date date = new Date();
         SimpleDateFormat formatdate = new SimpleDateFormat("dd", Locale.ENGLISH);
@@ -225,7 +213,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
     }
 
     private void setWeatherIcon(String skycode) {
-        Log.d("event123",skycode);
+        Log.d("event123", skycode);
         if (skycode.equals("SKY_A01")) {
             weatherIcon.setScaleY(1.1f);
             weatherIcon.setScaleX(1.1f);
@@ -249,7 +237,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
         } else if (skycode.equals("SKY_A06")) {
             weatherIcon.setScaleY(0.9f);
             weatherIcon.setScaleX(0.9f);
-            setImage( R.drawable.sky_a06, false);
+            setImage(R.drawable.sky_a06, false);
         } else if (skycode.equals("SKY_A07")) {
             weatherIcon.setScaleY(1.6f);
             weatherIcon.setScaleX(1.6f);
@@ -302,8 +290,9 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
     protected void onResume() {
         super.onResume();
         startService(new Intent(this, GPSTracker.class));
-        bindService(new Intent(this,GPSTracker.class),this,BIND_AUTO_CREATE);
+        bindService(new Intent(this, GPSTracker.class), this, BIND_AUTO_CREATE);
         ((LockApplication) getApplication()).lockScreenShow = true;
+        bindService(new Intent(this, LockscreenService.class),this,BIND_AUTO_CREATE);
     }
 
     @Override
@@ -396,6 +385,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
             } else if (todaySt.equals(specialDay[3])) {
                 Glide.with(this).load(specialImgs[3]).into(background);
             } else {
+
                 setWeatherBackground(skyCode, thisMonth, today);
             }
         } catch (ParseException e) {
@@ -406,168 +396,193 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
 
     private void setWeatherBackground(String skycode, String thisMonth, Date date) {
 
-        Date checkdate = new Date();
+        Date checkdate = service.getDate();
         //비올때 아이콘 랜덤하게 배경 출력
         Resources res = getResources();
-        String[] rainyImgs = res.getStringArray(R.array.rainIcon);
-        String[] ranImgs = res.getStringArray(R.array.randomBack);
-        String[] ranAugImgs = res.getStringArray(R.array.randomAug);
-        String[] ranMarchImgs = res.getStringArray(R.array.randomMarch);
-        String[] ranMayImgs = res.getStringArray(R.array.randomMay);
-        String[] ranJulyImgs = res.getStringArray(R.array.randomJuly);
-        String[] ranOctImgs = res.getStringArray(R.array.randomOct);
-        String[] ranNovImgs = res.getStringArray(R.array.randomNov);
-        String[] ranSepImgs = res.getStringArray(R.array.randomSep);
+        rainyImgs = res.getStringArray(R.array.rainIcon);
+        ranImgs = res.getStringArray(R.array.randomBack);
+        ranAugImgs = res.getStringArray(R.array.randomAug);
+        ranMarchImgs = res.getStringArray(R.array.randomMarch);
+        ranMayImgs = res.getStringArray(R.array.randomMay);
+        ranJulyImgs = res.getStringArray(R.array.randomJuly);
+        ranOctImgs = res.getStringArray(R.array.randomOct);
+        ranNovImgs = res.getStringArray(R.array.randomNov);
+        ranSepImgs = res.getStringArray(R.array.randomSep);
 
-        //Random random = new Random();
-
-        if(!checkdate.equals(date)) {
-            //다른 날이면 randomNum 바꾸기
-            Random random = new Random();
-            rainyNum = random.nextInt( rainyImgs.length-1);
-            randomNum = random.nextInt(ranImgs.length - 1);
-            randomNumAug = random.nextInt(ranAugImgs.length - 1);
-            randomNumMarch = random.nextInt( ranMarchImgs.length - 1);
-            randomNumMay = random.nextInt(ranMayImgs.length - 1);
-            randomNumJuly = random.nextInt(ranJulyImgs.length - 1);
-            randomNumOct = random.nextInt(ranOctImgs.length - 1);
-            randomNumNov = random.nextInt(ranNovImgs.length - 1);
-            randomNumSep = random.nextInt( ranNovImgs.length - 1);
-            rainyNum = checkRandomNum(rainyNum, rainyImgs.length-1);
-            randomNumAug = checkRandomNum(randomNumAug, ranAugImgs.length-1);
-            randomNumMarch = checkRandomNum(randomNumMarch, ranMarchImgs.length-1);
-            randomNumMay = checkRandomNum(randomNumMay, ranMayImgs.length-1);
-            randomNumJuly = checkRandomNum(randomNumJuly, ranJulyImgs.length-1);
-            randomNumSep = checkRandomNum(randomNumSep, ranSepImgs.length-1);
-            randomNumOct = checkRandomNum(randomNumOct, ranOctImgs.length-1);
-            randomNumNov = checkRandomNum(randomNumNov, ranNovImgs.length-1);
-            randomNum = checkRandomNum(randomNum, ranImgs.length-1);
-
-            if (skycode.equals("SKY_A04") || skycode.equals("SKY_A08")||skycode.equals("SKY_A06") ||
-                    skycode.equals("SKY_A10")||skycode.equals("SKY_A12")||skycode.equals("SKY_A14")) {
-                setImage(rainyImgs[rainyNum]);
-            } else {
-                //simpledatecode pasing 한게 MMM aug,march,may,july,oct,nov)
-                if (thisMonth.equals("Aug")) {
-
-                    setImage(ranAugImgs[randomNumAug]);
-                } else if (thisMonth.equals("Mar")) {
-
-                    if (randomNumMarch == 0) {
-                        content1.setText(user_name + "님 아직 날씨가 쌀쌀하네요.");
-                        content2.setText("감기 조심하세요.");
-                    }
-                    setImage(ranMarchImgs[randomNumMarch]);
-                } else if (thisMonth.equals("May")) {
-
-                    if (randomNumMay == 0) {
-                        content1.setText(user_name);
-                        content2.setText("늦게까지 수고 많았어요.");
-                    }
-                    setImage(ranMayImgs[randomNumMay]);
-                } else if (thisMonth.equals("Jul")) {
-
-                    setImage(ranJulyImgs[randomNumJuly]);
-                } else if (thisMonth.equals("Sep")) {
-
-                    if (randomNumSep == 0) {
-                        content1.setText(user_name + "님 ");
-                        content2.setText("걱정없는 밤 되세요.");
-                    }
-                    setImage(ranSepImgs[randomNumSep]);
-                } else if (thisMonth.equals("Oct")) {
-
-                    setImage(ranOctImgs[randomNumOct]);
-                } else if (thisMonth.equals("Nov")) {
-
-                    setImage(ranOctImgs[randomNumNov]);
-                } else {
-
-                    setImage(ranImgs[randomNum]);
-                }
-            }
+        if(checkdate == null) {
+            service.setDate(date);
+            getRandomNumber();
         }else{
-            int rainyNum = getRainyNum();
-            int randomNum = getRandomNum();
-            int randomNumAug = getRandomNumAug();
-            int randomNumMarch = getRandomNumMarch();
-            int randomNumMay = getRandomNumMay();
-            int randomNumJuly = getRandomNumJuly();
-            int randomNumOct = getRandomNumOct();
-            int randomNumNov = getRandomNumNov();
-            int randomNumSep = getRandomNumSep();
 
-            if (skycode.equals("SKY_A04") || skycode.equals("SKY_A08")||skycode.equals("SKY_A06") ||
-                    skycode.equals("SKY_A10")||skycode.equals("SKY_A12")||skycode.equals("SKY_A14")) {
-                setImage(rainyImgs[rainyNum]);
-            } else {
-                //simpledatecode pasing 한게 MMM aug,march,may,july,oct,nov)
-                if (thisMonth.equals("Aug")) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(checkdate);
+            int checkDay = calendar.get(Calendar.DAY_OF_MONTH);
+            Log.d("event123",String.valueOf(checkDay));
+            calendar.setTime(date);
+            int now = calendar.get(Calendar.DAY_OF_MONTH);
+            Log.d("event123",String.valueOf(now));
 
-                    setImage(ranAugImgs[randomNumAug]);
-                } else if (thisMonth.equals("Mar")) {
+            if (checkDay!=now) {
+                service.setDate(date);
+                generateRandomNum();
+            }else{
+                getRandomNumber();
+            }
 
-                    if (randomNumMarch == 0) {
-                        content1.setText(user_name + "님 아직 날씨가 쌀쌀하네요.");
-                        content2.setText("감기 조심하세요.");
-                    }
-                    setImage(ranMarchImgs[randomNumMarch]);
-                } else if (thisMonth.equals("May")) {
+        }
+        setImage(skycode, thisMonth);
+    }
+    private void setImage(String skycode, String thisMonth){
 
-                    if (randomNumMay == 0) {
-                        content1.setText(user_name);
-                        content2.setText("늦게까지 수고 많았어요.");
-                    }
-                    setImage(ranMayImgs[randomNumMay]);
-                } else if (thisMonth.equals("Jul")) {
-
-                    setImage(ranJulyImgs[randomNumJuly]);
-                } else if (thisMonth.equals("Sep")) {
-
-                    if (randomNumSep == 0) {
-                        content1.setText(user_name + "님 ");
-                        content2.setText("걱정없는 밤 되세요.");
-                    }
-                    setImage(ranSepImgs[randomNumSep]);
-                } else if (thisMonth.equals("Oct")) {
-
-                    setImage(ranOctImgs[randomNumOct]);
-                } else if (thisMonth.equals("Nov")) {
-
-                    setImage(ranOctImgs[randomNumNov]);
-                } else {
-
-                    setImage(ranImgs[randomNum]);
+        if (skycode.equals("SKY_A04") || skycode.equals("SKY_A08") || skycode.equals("SKY_A06") ||
+                skycode.equals("SKY_A10") || skycode.equals("SKY_A12") || skycode.equals("SKY_A14")) {
+            setImage(rainyImgs[rainyNum]);
+        } else {
+            //simpledatecode pasing 한게 MMM aug,march,may,july,oct,nov)
+            if (thisMonth.equals("Aug")) {
+                if(randomNumAug == 0) {
+                    content1.setText(user_name + "님");
+                    content2.setText("멋진 하루 보내세요.");
+                }else if(randomNumAug == 1){
+                    content1.setText(user_name + "님 충분히 잘 하고 있어요.");
+                    content2.setText("오늘도 화이팅.");
                 }
+
+                setImage(ranAugImgs[randomNumAug]);
+            } else if (thisMonth.equals("Mar")) {
+
+                if (randomNumMarch == 0) {
+                    content1.setText(user_name + "님 아직 날씨가 쌀쌀하네요.");
+                    content2.setText("감기 조심하세요.");
+                }else if(randomNumMarch == 1) {
+                    content1.setText(user_name + "님");
+                    content2.setText("멋진 하루 보내세요.");
+                }else if(randomNumMarch == 2){
+                    content1.setText(user_name + "님 충분히 잘 하고 있어요.");
+                    content2.setText("오늘도 화이팅.");
+                }
+
+                setImage(ranMarchImgs[randomNumMarch]);
+            } else if (thisMonth.equals("May")) {
+
+                if (randomNumMay == 0) {
+                    content1.setText(user_name);
+                    content2.setText("늦게까지 수고 많았어요.");
+                }else if(randomNumMay == 1) {
+                    content1.setText(user_name + "님");
+                    content2.setText("멋진 하루 보내세요.");
+                }else if(randomNumMay == 2){
+                    content1.setText(user_name + "님 충분히 잘 하고 있어요.");
+                    content2.setText("오늘도 화이팅.");
+                }
+                setImage(ranMayImgs[randomNumMay]);
+            } else if (thisMonth.equals("Jul")) {
+                if(randomNumJuly == 0) {
+                    content1.setText(user_name + "님");
+                    content2.setText("멋진 하루 보내세요.");
+                }else if(randomNumJuly == 1){
+                    content1.setText(user_name + "님 충분히 잘 하고 있어요.");
+                    content2.setText("오늘도 화이팅.");
+                }
+
+                setImage(ranJulyImgs[randomNumJuly]);
+            } else if (thisMonth.equals("Sep")) {
+
+                if (randomNumSep == 0) {
+                    content1.setText(user_name + "님 ");
+                    content2.setText("걱정없는 밤 되세요.");
+                }else if(randomNumSep == 1) {
+                    content1.setText(user_name + "님");
+                    content2.setText("멋진 하루 보내세요.");
+                }else if(randomNumSep == 2){
+                    content1.setText(user_name + "님 충분히 잘 하고 있어요.");
+                    content2.setText("오늘도 화이팅.");
+                }
+
+                setImage(ranSepImgs[randomNumSep]);
+            } else if (thisMonth.equals("Oct")) {
+
+                if(randomNumOct == 0) {
+                    content1.setText(user_name + "님");
+                    content2.setText("멋진 하루 보내세요.");
+                }else if(randomNumOct == 1){
+                    content1.setText(user_name + "님 충분히 잘 하고 있어요.");
+                    content2.setText("오늘도 화이팅.");
+                }
+
+                setImage(ranOctImgs[randomNumOct]);
+            } else if (thisMonth.equals("Nov")) {
+                if(randomNumNov == 0) {
+                    content1.setText(user_name + "님");
+                    content2.setText("멋진 하루 보내세요.");
+                }else if(randomNumNov == 1){
+                    content1.setText(user_name + "님 충분히 잘 하고 있어요.");
+                    content2.setText("오늘도 화이팅.");
+                }
+
+                setImage(ranOctImgs[randomNumNov]);
+            } else {
+                if(randomNum == 0) {
+                    content1.setText(user_name + "님");
+                    content2.setText("멋진 하루 보내세요.");
+                }else if(randomNum == 1){
+                    content1.setText(user_name + "님 충분히 잘 하고 있어요.");
+                    content2.setText("오늘도 화이팅.");
+                }
+
+                setImage(ranImgs[randomNum]);
             }
         }
+
     }
-    private int getRainyNum(){
-        return rainyNum;
+
+    private void generateRandomNum() {
+        Random random = new Random();
+        rainyNum = random.nextInt(rainyImgs.length - 1);
+        randomNum = random.nextInt(ranImgs.length - 1);
+        randomNumAug = random.nextInt(ranAugImgs.length - 1);
+        randomNumMarch = random.nextInt(ranMarchImgs.length - 1);
+        randomNumMay = random.nextInt(ranMayImgs.length - 1);
+        randomNumJuly = random.nextInt(ranJulyImgs.length - 1);
+        randomNumOct = random.nextInt(ranOctImgs.length - 1);
+        randomNumNov = random.nextInt(ranNovImgs.length - 1);
+        randomNumSep = random.nextInt(ranNovImgs.length - 1);
+        rainyNum = checkRandomNum(rainyNum, rainyImgs.length - 1);
+        randomNumAug = checkRandomNum(randomNumAug, ranAugImgs.length - 1);
+        randomNumMarch = checkRandomNum(randomNumMarch, ranMarchImgs.length - 1);
+        randomNumMay = checkRandomNum(randomNumMay, ranMayImgs.length - 1);
+        randomNumJuly = checkRandomNum(randomNumJuly, ranJulyImgs.length - 1);
+        randomNumSep = checkRandomNum(randomNumSep, ranSepImgs.length - 1);
+        randomNumOct = checkRandomNum(randomNumOct, ranOctImgs.length - 1);
+        randomNumNov = checkRandomNum(randomNumNov, ranNovImgs.length - 1);
+        randomNum = checkRandomNum(randomNum, ranImgs.length - 1);
+
+        randomNumber.setRainyNum(rainyNum);
+        randomNumber.setRandomNum(randomNum);
+        randomNumber.setRandomNumAug(randomNumAug);
+        randomNumber.setRandomNumMarch(randomNumMarch);
+        randomNumber.setRandomNumMay(randomNumMay);
+        randomNumber.setRandomNumJuly(randomNumJuly);
+        randomNumber.setRandomNumOct(randomNumOct);
+        randomNumber.setRandomNumNov(randomNumNov);
+        randomNumber.setRandomNumSep(randomNumSep);
+
+        service.setRandomNumber(randomNumber);
     }
-    private int getRandomNum(){
-        return randomNum;
-    }
-    private int getRandomNumAug(){
-        return randomNumAug;
-    }
-    private int getRandomNumMarch(){
-        return randomNumMarch;
-    }
-    private int getRandomNumMay(){
-        return randomNumMay;
-    }
-    private int getRandomNumJuly(){
-        return randomNumJuly;
-    }
-    private int getRandomNumOct(){
-        return randomNumOct;
-    }
-    private int getRandomNumNov(){
-        return randomNumNov;
-    }
-    private int getRandomNumSep(){
-        return randomNumSep;
+
+    private void getRandomNumber() {
+
+        randomNumber = service.getRandomNumber();
+        rainyNum = randomNumber.getRainyNum();
+        randomNum = randomNumber.getRandomNum();
+        randomNumAug = randomNumber.getRandomNumAug();
+        randomNumMarch = randomNumber.getRandomNumMarch();
+        randomNumMay = randomNumber.getRandomNumMay();
+        randomNumJuly = randomNumber.getRandomNumJuly();
+        randomNumOct = randomNumber.getRandomNumOct();
+        randomNumNov = randomNumber.getRandomNumNov();
+        randomNumSep = randomNumber.getRandomNumSep();
+
     }
 
 
@@ -576,7 +591,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
         if (yesterday_i == today_i) {
             today_i++;
             if (today_i > arraySize) {
-                today_i = random.nextInt(arraySize-1);
+                today_i = random.nextInt(arraySize - 1);
             }
         }
         yesterday_i = today_i;
@@ -599,9 +614,30 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
 
     @Override
     public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-        GPSTracker.GpsBinder binder = (GPSTracker.GpsBinder) iBinder;
-        gps = binder.getService();
-        GPSEvent();
+        if (iBinder instanceof GPSTracker.GpsBinder) {
+            GPSTracker.GpsBinder binder = (GPSTracker.GpsBinder) iBinder;
+            gps = binder.getService();
+            GPSEvent();
+        } else if (iBinder instanceof LockscreenService.NotiBinder) {
+            LockscreenService.NotiBinder notiBinder = (LockscreenService.NotiBinder) iBinder;
+            service = notiBinder.getService();
+
+            getData();
+            showComponet();
+            setTypeface();
+            setDate();
+            timeHandler = new TimeHandler(this);
+
+            startRealTimeTimer();
+            setIcon();
+
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                        0);
+            }
+
+
+        }
     }
 
     @Override
@@ -626,7 +662,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
     protected void onStop() {
         super.onStop();
         unbindService(this);
-        if(gps!=null){
+        if (gps != null) {
             gps.stopUsingGPS();
         }
     }
@@ -634,7 +670,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (timer!=null){
+        if (timer != null) {
             timer.cancel();
             timeHandler = null;
             timerTask = null;
