@@ -1,18 +1,14 @@
 package com.thirdtou;
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.admin.DeviceAdminReceiver;
-import android.app.admin.DevicePolicyManager;
-import android.bluetooth.BluetoothClass;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Typeface;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -32,7 +28,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.thirdtou.Weather.MinutelyWeather;
-import com.thirdtou.utils.DeviceReceiver;
 import com.thirdtou.utils.LockscreenService;
 import com.thirdtou.utils.RandomNumber;
 
@@ -46,29 +41,32 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static android.view.View.GONE;
+
 /**
  * Created by Administrator on 2018-02-27.
  */
 
-public class NotificationExampleActivity extends AppCompatActivity implements View.OnClickListener, ServiceConnection{
+public class NotificationExampleActivity extends AppCompatActivity implements View.OnClickListener, ServiceConnection, LocationListener{
 
+
+    //loading 화면
+    ImageView loadingImage;
+    TextView loading_txt;
 
     //randomNum
     RandomNumber randomNumber = new RandomNumber();
 
-
-    //GPSTracker
-    GPSTracker gps = null;
-
     double latitude;
     double longitude;
-
 
     //배경 setting하기
     ImageView background;
@@ -100,6 +98,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
     int randomNumOct;
     int randomNumNov;
     int randomNumSep;
+    int randomNumDec;
 
     LockscreenService service;
 
@@ -113,14 +112,21 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
     String[] ranOctImgs;
     String[] ranNovImgs;
     String[] ranSepImgs;
+    String[] ranDecImgs;
+
+    LocationManager locationManager;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         setContentView(R.layout.activity_notificationexample);
 
+        showComponet();
         LockApplication.activities.add(this);
+        requestLocation();
+
 
     }
 
@@ -141,32 +147,20 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
 
     }
 
-    private void updateTimeText() {
-        currentTime.setText(curTime);
+    private void requestLocation(){
+
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    0);
+        }else{
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,500,1,this);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,500,1,this);
+        }
+
     }
 
-    //GPS code
-
-
-    public void GPSEvent() {
-        if (gps == null) {
-            bindService(new Intent(this, GPSTracker.class), this, BIND_AUTO_CREATE);
-        } else {
-            gps.Update();
-        }
-
-        // check if GPS enabled
-        if (gps.canGetLocation()) {
-            latitude = gps.getLatitude();
-            longitude = gps.getLongitude();
-            getWeather(latitude, longitude);
-            // \n is for new line
-        } else {
-            // can't get location
-            // GPS or Network is not enabled
-            // Ask user to enable GPS/network in settings
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 100);
-        }
+    private void updateTimeText() {
+        currentTime.setText(curTime);
     }
 
     //화면 초기화
@@ -182,7 +176,23 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
         weatherIcon = findViewById(R.id.weatherimage);
         icon = findViewById(R.id.icon);
 
+        loadingImage = findViewById(R.id.logo_gif);
+        loading_txt = findViewById(R.id.logo);
+
+        weatherIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                requestLocation();
+            }
+        });
+
         button_touch.setOnClickListener(this);
+        if(this.isFinishing()){
+            return;
+        }else {
+            Glide.with(this).load(R.drawable.gradiant).into(background);
+            Glide.with(this).load(R.drawable.tou_icon).into(loadingImage);
+        }
     }
     /**
      *
@@ -223,8 +233,6 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
     private void setWeatherIcon(String skycode) {
         Log.d("event123", skycode);
         if (skycode.equals("SKY_A01")) {
-            weatherIcon.setScaleY(1.1f);
-            weatherIcon.setScaleX(1.1f);
             setImage(R.drawable.sky_a01, true);
         } else if (skycode.equals("SKY_A02")) {
             weatherIcon.setScaleX(1.6f);
@@ -276,17 +284,20 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
     }
 
     private void setImage(int resource, boolean b) {
-
-        Glide.with(this).load(resource).into(weatherIcon);
+        if(this.isFinishing()){
+            return;
+        }else {
+            loadingImage.setVisibility(View.GONE);
+            loading_txt.setVisibility(View.GONE);
+            Glide.with(this).load(resource).into(weatherIcon);
+        }
 
     }
 
     @Override
     public void onAttachedToWindow() {
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
-                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
-//                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON|
+        getWindow().addFlags(
                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
@@ -297,8 +308,6 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
     @Override
     protected void onResume() {
         super.onResume();
-        startService(new Intent(this, GPSTracker.class));
-        bindService(new Intent(this, GPSTracker.class), this, BIND_AUTO_CREATE);
         ((LockApplication) getApplication()).lockScreenShow = true;
         bindService(new Intent(this, LockscreenService.class),this,BIND_AUTO_CREATE);
 
@@ -313,8 +322,14 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
 
     //날씨 정보 받아오는 코드
     private void getWeather(double latitude, double longtitude) {
+        Log.d("event123","long"+ longtitude+"lat"+latitude);
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(logging)
+                .build();
         Retrofit retrofit = new Retrofit.Builder().addConverterFactory(GsonConverterFactory.create())
-                .baseUrl(ApiService.BASEURL).build();
+                .baseUrl(ApiService.BASEURL).client(client).build();
         ApiService apiService = retrofit.create(ApiService.class);
         Call<MinutelyWeather> call = apiService.getMinutely(ApiService.APPKEY, 1, latitude, longtitude);
         call.enqueue(new Callback<MinutelyWeather>() {
@@ -335,7 +350,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
                     if (object != null) {
                         //데이터가 null이 아니면 날씨 데이터 텍스트 뷰로 보여주기
                         //setCurrent_time();
-                         setBackground(skyCode);
+                        setBackground(skyCode);
                         celcious.setText(temper);
                         setWeatherIcon(skyCode);
 
@@ -377,7 +392,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
         try {
             Date date = formatter2.parse(user_birth);
             String birth = formatter.format(date);
-            String[] specialDay = {startSt, birth, "24 Sep", "07 Aug"};
+            String[] specialDay = {startSt, birth, "24 Sep", "07 Aug", "25 Dec"};
             Date today = new Date();
             today.setTime(System.currentTimeMillis());
             String todaySt = formatter.format(today);
@@ -386,18 +401,42 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
             Resources res = getResources();
             String[] specialImgs = res.getStringArray(R.array.specialday);
 
-            if (todaySt.equals(specialDay[0])) {
-                Glide.with(this).load(specialImgs[0]).into(background);
+            /*if (todaySt.equals(specialDay[0])) {
+                if(this.isFinishing()){
+                    return;
+                }else {
+                    Glide.with(this).load(specialImgs[0]).into(background);
+                }
             } else if (todaySt.equals(specialDay[1])) {
-                Glide.with(this).load(specialImgs[1]).into(background);
+                if(this.isFinishing()){
+                    return;
+                }else {
+                    Glide.with(this).load(specialImgs[1]).into(background);
+                }
             } else if (todaySt.equals(specialDay[2])) {
-                Glide.with(this).load(specialImgs[2]).into(background);
+                if(this.isFinishing()){
+                    return;
+                }else {
+                    Glide.with(this).load(specialImgs[2]).into(background);
+                }
             } else if (todaySt.equals(specialDay[3])) {
-                Glide.with(this).load(specialImgs[3]).into(background);
-            } else {
-
-                setWeatherBackground(skyCode, thisMonth, today);
+                if(this.isFinishing()){
+                    return;
+                }else {
+                    Glide.with(this).load(specialImgs[3]).into(background);
+                }
+            } else if (todaySt.equals(specialDay[4])){
+                if(this.isFinishing()){
+                    return;
+                }else {
+                    Glide.with(this).load(specialImgs[4]).into(background);
+                }
             }
+            else {
+                setWeatherBackground(skyCode, thisMonth, today);
+            }*/
+
+            setWeatherBackground(skyCode, thisMonth, today);
         } catch (ParseException e) {
         }
 
@@ -407,6 +446,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
     private void setWeatherBackground(String skycode, String thisMonth, Date date) {
 
         Date checkdate = service.getDate();
+
         //비올때 아이콘 랜덤하게 배경 출력
         Resources res = getResources();
         rainyImgs = res.getStringArray(R.array.rainIcon);
@@ -418,19 +458,20 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
         ranOctImgs = res.getStringArray(R.array.randomOct);
         ranNovImgs = res.getStringArray(R.array.randomNov);
         ranSepImgs = res.getStringArray(R.array.randomSep);
+        ranDecImgs = res.getStringArray(R.array.randomDec);
 
         if(checkdate == null) {
             service.setDate(date);
-            getRandomNumber();
+            generateRandomNum();
         }else{
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(checkdate);
             int checkDay = calendar.get(Calendar.DAY_OF_MONTH);
-            Log.d("event123",String.valueOf(checkDay));
+            Log.d("event123","checkdate:"+ String.valueOf(checkDay));
             calendar.setTime(date);
             int now = calendar.get(Calendar.DAY_OF_MONTH);
-            Log.d("event123",String.valueOf(now));
+            Log.d("event123","today:"+String.valueOf(now));
 
             if (checkDay!=now) {
                 service.setDate(date);
@@ -450,13 +491,6 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
         } else {
             //simpledatecode pasing 한게 MMM aug,march,may,july,oct,nov)
             if (thisMonth.equals("Aug")) {
-                if(randomNumAug == 0) {
-                    content1.setText(user_name + "님");
-                    content2.setText("멋진 하루 보내세요.");
-                }else if(randomNumAug == 1){
-                    content1.setText(user_name + "님 충분히 잘 하고 있어요.");
-                    content2.setText("오늘도 화이팅.");
-                }
 
                 setImage(ranAugImgs[randomNumAug]);
             } else if (thisMonth.equals("Mar")) {
@@ -464,12 +498,6 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
                 if (randomNumMarch == 0) {
                     content1.setText(user_name + "님 아직 날씨가 쌀쌀하네요.");
                     content2.setText("감기 조심하세요.");
-                }else if(randomNumMarch == 1) {
-                    content1.setText(user_name + "님");
-                    content2.setText("멋진 하루 보내세요.");
-                }else if(randomNumMarch == 2){
-                    content1.setText(user_name + "님 충분히 잘 하고 있어요.");
-                    content2.setText("오늘도 화이팅.");
                 }
 
                 setImage(ranMarchImgs[randomNumMarch]);
@@ -478,22 +506,9 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
                 if (randomNumMay == 0) {
                     content1.setText(user_name);
                     content2.setText("늦게까지 수고 많았어요.");
-                }else if(randomNumMay == 1) {
-                    content1.setText(user_name + "님");
-                    content2.setText("멋진 하루 보내세요.");
-                }else if(randomNumMay == 2){
-                    content1.setText(user_name + "님 충분히 잘 하고 있어요.");
-                    content2.setText("오늘도 화이팅.");
                 }
                 setImage(ranMayImgs[randomNumMay]);
             } else if (thisMonth.equals("Jul")) {
-                if(randomNumJuly == 0) {
-                    content1.setText(user_name + "님");
-                    content2.setText("멋진 하루 보내세요.");
-                }else if(randomNumJuly == 1){
-                    content1.setText(user_name + "님 충분히 잘 하고 있어요.");
-                    content2.setText("오늘도 화이팅.");
-                }
 
                 setImage(ranJulyImgs[randomNumJuly]);
             } else if (thisMonth.equals("Sep")) {
@@ -501,36 +516,18 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
                 if (randomNumSep == 0) {
                     content1.setText(user_name + "님 ");
                     content2.setText("걱정없는 밤 되세요.");
-                }else if(randomNumSep == 1) {
-                    content1.setText(user_name + "님");
-                    content2.setText("멋진 하루 보내세요.");
-                }else if(randomNumSep == 2){
-                    content1.setText(user_name + "님 충분히 잘 하고 있어요.");
-                    content2.setText("오늘도 화이팅.");
                 }
 
                 setImage(ranSepImgs[randomNumSep]);
             } else if (thisMonth.equals("Oct")) {
 
-                if(randomNumOct == 0) {
-                    content1.setText(user_name + "님");
-                    content2.setText("멋진 하루 보내세요.");
-                }else if(randomNumOct == 1){
-                    content1.setText(user_name + "님 충분히 잘 하고 있어요.");
-                    content2.setText("오늘도 화이팅.");
-                }
-
                 setImage(ranOctImgs[randomNumOct]);
             } else if (thisMonth.equals("Nov")) {
-                if(randomNumNov == 0) {
-                    content1.setText(user_name + "님");
-                    content2.setText("멋진 하루 보내세요.");
-                }else if(randomNumNov == 1){
-                    content1.setText(user_name + "님 충분히 잘 하고 있어요.");
-                    content2.setText("오늘도 화이팅.");
-                }
 
                 setImage(ranOctImgs[randomNumNov]);
+            } else if (thisMonth.equals("Dec")){
+
+                setImage(ranDecImgs[randomNumDec]);
             } else {
                 if(randomNum == 0) {
                     content1.setText(user_name + "님");
@@ -538,6 +535,15 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
                 }else if(randomNum == 1){
                     content1.setText(user_name + "님 충분히 잘 하고 있어요.");
                     content2.setText("오늘도 화이팅.");
+                }else if(randomNum == 2){
+                    content1.setText(user_name + "님");
+                    content2.setText("이루고 싶은 무언가는 찾으셨나요");
+                }else if(randomNum == 3){
+                    content1.setText(user_name + "님");
+                    content2.setText("웃는 하루 되세요.");
+                }else if(randomNum == 4){
+                    content1.setText(user_name + "님의");
+                    content2.setText("멋진 날을 응원할게요.");
                 }
 
                 setImage(ranImgs[randomNum]);
@@ -547,6 +553,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
     }
 
     private void generateRandomNum() {
+
         Random random = new Random();
         rainyNum = random.nextInt(rainyImgs.length - 1);
         randomNum = random.nextInt(ranImgs.length - 1);
@@ -557,6 +564,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
         randomNumOct = random.nextInt(ranOctImgs.length - 1);
         randomNumNov = random.nextInt(ranNovImgs.length - 1);
         randomNumSep = random.nextInt(ranNovImgs.length - 1);
+        randomNumDec = random.nextInt(ranDecImgs.length-1);
         rainyNum = checkRandomNum(rainyNum, rainyImgs.length - 1);
         randomNumAug = checkRandomNum(randomNumAug, ranAugImgs.length - 1);
         randomNumMarch = checkRandomNum(randomNumMarch, ranMarchImgs.length - 1);
@@ -565,6 +573,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
         randomNumSep = checkRandomNum(randomNumSep, ranSepImgs.length - 1);
         randomNumOct = checkRandomNum(randomNumOct, ranOctImgs.length - 1);
         randomNumNov = checkRandomNum(randomNumNov, ranNovImgs.length - 1);
+        randomNumDec = checkRandomNum(randomNumDec,ranDecImgs.length-1);
         randomNum = checkRandomNum(randomNum, ranImgs.length - 1);
 
         randomNumber.setRainyNum(rainyNum);
@@ -576,6 +585,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
         randomNumber.setRandomNumOct(randomNumOct);
         randomNumber.setRandomNumNov(randomNumNov);
         randomNumber.setRandomNumSep(randomNumSep);
+        randomNumber.setRandomNumDec(randomNumDec);
 
         service.setRandomNumber(randomNumber);
     }
@@ -592,6 +602,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
         randomNumOct = randomNumber.getRandomNumOct();
         randomNumNov = randomNumber.getRandomNumNov();
         randomNumSep = randomNumber.getRandomNumSep();
+        randomNumDec = randomNumber.getRandomNumDec();
 
     }
 
@@ -611,7 +622,12 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
 
     private void setImage(String resource) {
 
-         Glide.with(this).load(resource).into(background);
+        if(this.isFinishing()){
+            return;
+        }else{
+            Glide.with(this).load(resource).into(background);
+        }
+
     }
 
     @Override
@@ -625,16 +641,11 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
 
     @Override
     public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-        if (iBinder instanceof GPSTracker.GpsBinder) {
-            GPSTracker.GpsBinder binder = (GPSTracker.GpsBinder) iBinder;
-            gps = binder.getService();
-            GPSEvent();
-        } else if (iBinder instanceof LockscreenService.NotiBinder) {
+        if (iBinder instanceof LockscreenService.NotiBinder) {
             LockscreenService.NotiBinder notiBinder = (LockscreenService.NotiBinder) iBinder;
             service = notiBinder.getService();
 
             getData();
-            showComponet();
             setTypeface();
             setDate();
             timeHandler = new TimeHandler(this);
@@ -642,10 +653,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
             startRealTimeTimer();
             setIcon();
 
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                        0);
-            }
+
 
 
         }
@@ -653,6 +661,31 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
 
     @Override
     public void onServiceDisconnected(ComponentName componentName) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        getWeather(latitude,longitude);
+        locationManager.removeUpdates(this);
+
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
 
     }
 
@@ -673,9 +706,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
     protected void onStop() {
         super.onStop();
         unbindService(this);
-        if (gps != null) {
-            gps.stopUsingGPS();
-        }
+
     }
 
     @Override

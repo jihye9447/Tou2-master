@@ -4,12 +4,14 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.thirdtou.utils.VersionChecker;
@@ -21,6 +23,8 @@ import com.thirdtou.utils.VersionChecker;
 public class LoadingActivity extends AppCompatActivity implements Runnable,VersionCheckCallback {
 
     ImageView tou_icon;
+    Typeface  typeface1;
+    TextView logo_text;
 
     SharedPreference sharedPreference= new SharedPreference();
     @Override
@@ -29,7 +33,11 @@ public class LoadingActivity extends AppCompatActivity implements Runnable,Versi
         setContentView(R.layout.loadpage);
 
         tou_icon = findViewById(R.id.logo_gif);
+        logo_text = findViewById(R.id.logo);
         setImage(R.drawable.tou_icon);
+        typeface1 = Typeface.createFromAsset(getAssets(), "fonts/sdgB.ttf");
+        logo_text.setTypeface(typeface1);
+
 
         //2초간 딜레이후 실행
         Handler handler = new Handler();

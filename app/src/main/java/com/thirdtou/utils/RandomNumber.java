@@ -5,8 +5,8 @@ package com.thirdtou.utils;
  */
 
 public class RandomNumber {
-    int rainyNum;
-    int randomNum;
+    int rainyNum ;
+    int randomNum ;
     int randomNumAug;
     int randomNumMarch;
     int randomNumMay;
@@ -14,6 +14,7 @@ public class RandomNumber {
     int randomNumOct;
     int randomNumNov;
     int randomNumSep;
+    int randomNumDec;
 
     public int getRainyNum() {
         return rainyNum;
@@ -86,4 +87,8 @@ public class RandomNumber {
     public void setRandomNumSep(int randomNumSep) {
         this.randomNumSep = randomNumSep;
     }
+
+    public int getRandomNumDec(){ return randomNumDec; }
+
+    public void setRandomNumDec(int randomNumDec){ this.randomNumDec = randomNumDec; }
 }

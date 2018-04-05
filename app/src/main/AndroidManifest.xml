@@ -44,7 +44,6 @@
         <service android:name="com.thirdtou.utils.LockscreenService" >
         </service>
 
-        <service android:name="com.thirdtou.GPSTracker"/>
         <service
             android:name="com.thirdtou.utils.LockWindowAccessibilityService"
             android:label="@string/app_name"
@@ -54,13 +53,5 @@
             </intent-filter>
         </service>
 
-        <receiver android:name=".utils.DeviceReceiver" android:permission="android.permission.BIND_DEVICE_ADMIN">
-            <meta-data android:name="android.app.device_admin"
-                android:resource="@xml/policies"/>
-
-            <intent-filter>
-                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED"/>
-            </intent-filter>
-        </receiver>
     </application>
 </manifest>

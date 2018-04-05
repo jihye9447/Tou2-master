@@ -11,35 +11,36 @@
 <RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginTop="25dp"
     android:layout_marginBottom="25dp">
+    <ImageView
+        android:id="@+id/empty"
+        android:layout_width="match_parent"
+        android:layout_height="202dp" />
+
+    <ImageView
+        android:layout_below="@+id/empty"
+        android:id="@+id/logo_gif"
+        android:layout_width="115dp"
+        android:scaleX="1.17"
+        android:layout_height="150dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginBottom="10dp"
+        android:visibility="visible" />
+
     <TextView
         android:id="@+id/logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="12.03dp"
-        android:layout_marginBottom="210dp"
-        android:layout_marginStart="111.12dp"
-        android:letterSpacing="0.1"
+        android:layout_marginStart="3dp"
+        android:layout_marginBottom="227dp"
+        android:letterSpacing="0.15"
         android:text="TOU"
         android:textColor="@color/colorWhite"
-        android:textSize="13.33dp"
-        />
-
-    <ImageView
-        android:id="@+id/logo_gif"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_above="@+id/logo"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="103.75dp"
-        android:visibility="visible"/>
-    <!--app:srcCompat="@drawable/tou_icon"
-        android:src="@drawable/tou_icon"-->
-        <!--android:scaleType="centerInside"-->
-        <!---->
+        android:textSize="13.33dp" />
 
 </RelativeLayout>
 

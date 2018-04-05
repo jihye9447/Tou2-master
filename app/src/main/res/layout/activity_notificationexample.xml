@@ -15,6 +15,34 @@
         android:layout_alignParentTop="true"
         android:scaleType="centerCrop" />
 
+    <ImageView
+        android:id="@+id/empty"
+        android:layout_width="match_parent"
+        android:layout_height="227dp" />
+
+    <ImageView
+        android:layout_below="@+id/empty"
+        android:id="@+id/logo_gif"
+        android:layout_width="115dp"
+        android:scaleX="1.17"
+        android:layout_height="150dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginBottom="10dp" />
+
+    <TextView
+        android:id="@+id/logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="3dp"
+        android:layout_marginBottom="252dp"
+        android:letterSpacing="0.15"
+        android:text="LOADING..."
+        android:textColor="@color/colorWhite"
+        android:textSize="13.33dp" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -59,7 +87,7 @@
                     android:id="@+id/weatherimage"
                     android:layout_width="85.67dp"
                     android:layout_height="75dp"
-                    android:layout_marginTop="96dp"
+                    android:layout_marginTop="93dp"
                     android:layout_gravity="center_horizontal"
                     tools:src="@drawable/fillingicon" />
 
@@ -71,7 +99,7 @@
                     android:gravity="center_horizontal"
                     tools:text = "14C"
                     android:layout_marginBottom="36dp"
-                    android:textSize="12dp"
+                    android:textSize="11.5dp"
                     android:textColor="@color/colorWhite" />
 
                 <TextView

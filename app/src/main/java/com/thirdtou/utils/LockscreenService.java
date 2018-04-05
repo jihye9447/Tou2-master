@@ -3,20 +3,20 @@ package com.thirdtou.utils;
 import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.app.Service;
-import android.app.admin.DeviceAdminReceiver;
-import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.thirdtou.ChecknameActivity;
 import com.thirdtou.LockApplication;
 import com.thirdtou.NotificationExampleActivity;
@@ -33,11 +33,6 @@ import java.util.concurrent.locks.Lock;
 
 public class LockscreenService extends Service{
 
-    //device lock 위한 변수
-    public static final int RESULT_ENABLE = 11;
-    private DevicePolicyManager devicePolicyManager;
-    private ActivityManager activityManager;
-    private ComponentName compName;
 
     Timer lock_timer = new Timer();
     TimerTask lock_timerTask;
@@ -56,10 +51,6 @@ public class LockscreenService extends Service{
     int count=0;
     SharedPreference sharedPreference = new SharedPreference();
     private NotificationManager mNM;
-
-    //lockscreen 하기 위한 componentName 선언
-    /*public DevicePolicyManager mDPM;
-    ComponentName devAdminReceiver;*/
 
     NotiBinder notiBinder = new NotiBinder();
 
@@ -87,43 +78,9 @@ public class LockscreenService extends Service{
                 }
 
 
-                lock_timerTask = new TimerTask() {
-                    @Override
-                    public void run() {
-                        if(LockApplication.activities.size()>0){
-                            for(AppCompatActivity activity: LockApplication.activities){
-                                screenLock();
-                                activity.finish();
-                            }
-                        }
-                    }
-                };
-                lock_timer.schedule(lock_timerTask,10*1000);
-
-
-                /*else if(intent.getAction().equals(Intent.ACTION_SCREEN_OFF)){
-                    end_time = System.currentTimeMillis();
-
-                        destroyActivity();
-
-                }else{
-                    //핸들러로 3초뒤에는 무조건 끄는 디스트로이 코드를 넣고 boolean변수를 하나두시고 이변수는 밖에다가
-                }*/
-
             }
         }
     };
-    public void screenLock(){
-
-        boolean isActive = devicePolicyManager.isAdminActive(compName);
-        Log.d("event123","isActive: "+ String.valueOf(isActive));
-        //Intent lock_intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-        //lock_intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, compName);
-        if(isActive){
-            devicePolicyManager.lockNow();
-        }
-
-    }
 
     private void stateRecever(boolean isStartRecever) {
         if (isStartRecever) {
@@ -146,10 +103,7 @@ public class LockscreenService extends Service{
         mContext = this;
         mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
-        devicePolicyManager = (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);
         //activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        compName= new ComponentName(this, DeviceReceiver.class);
-
     }
 
     @Override
@@ -173,20 +127,10 @@ public class LockscreenService extends Service{
         mNM.cancel(((LockApplication) getApplication()).notificationId);
     }
 
-    public void isActiveCheck(){
-
-        boolean isActive = devicePolicyManager.isAdminActive(compName);
-        Intent lock_intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-        lock_intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, compName);
-        startActivity(lock_intent);
-        if(isActive){
-            devicePolicyManager.lockNow();
-        }
-    }
-
     private void startLockscreenActivity() {
 
         Intent startLockscreenActIntent = new Intent(mContext, NotificationExampleActivity.class);
+        startLockscreenActIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startLockscreenActIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(startLockscreenActIntent);
     }
@@ -199,19 +143,35 @@ public class LockscreenService extends Service{
         }
     }
 
+    public void saveDate(Date date){
+        sharedPreference.put(getApplicationContext(),"date",date.getTime());
+    }
+
+    public void saveRandomNumber(RandomNumber randomNumber){
+        sharedPreference.put(getApplicationContext(),"randomNumber",randomNumber);
+    }
+
     public RandomNumber getRandomNumber() {
+        randomNumber = sharedPreference.getValue(getApplicationContext(),"randomNumber",RandomNumber.class);
         return randomNumber;
     }
 
     public void setRandomNumber(RandomNumber randomNumber) {
-        this.randomNumber = randomNumber;
+        saveRandomNumber(randomNumber);
     }
 
     public Date getDate() {
-        return date;
+        long time = sharedPreference.getValue(getApplicationContext(),"date", 0L);
+        if(time==0){
+            return null;
+        }else{
+            date = new Date();
+            date.setTime(time);
+            return date;
+        }
     }
 
     public void setDate(Date date) {
-        this.date = date;
+        saveDate(date);
     }
 }
