@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 public class ChecknameActivity extends AppCompatActivity{
 
-    TextView check_name, question;
+    TextView check_name, question, title;
     String user_name;
     Typeface typeface1, typeface2;
     Button button_r, button_n;
@@ -41,6 +41,8 @@ public class ChecknameActivity extends AppCompatActivity{
         button_r.setOnClickListener(onButtonClick);
         button_n = findViewById(R.id.button_next);
         button_n.setOnClickListener(onButtonClick);
+
+        title = findViewById(R.id.logo_design);
     }
 
     public void setTypeface(){
@@ -52,6 +54,7 @@ public class ChecknameActivity extends AppCompatActivity{
         check_name.setTypeface(typeface2);
         question.setTypeface(typeface1);
         question.setShadowLayer(10,0,0, Color.WHITE);
+        title.setTypeface(typeface2);
     }
     Button.OnClickListener onButtonClick = new Button.OnClickListener(){
 

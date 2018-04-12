@@ -8,10 +8,17 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.Log;
@@ -31,12 +38,13 @@ import java.util.concurrent.locks.Lock;
  * Created by Administrator on 2018-03-01.
  */
 
-public class LockscreenService extends Service{
+public class LockscreenService extends Service implements LocationListener{
 
 
-    Timer lock_timer = new Timer();
-    TimerTask lock_timerTask;
 
+
+    LocationManager locationManager;
+    double longitude, latitude;
 
     long start_time = 0;
     long end_time = 0;
@@ -45,14 +53,36 @@ public class LockscreenService extends Service{
     Date date;
 
 
-    private final String TAG = "LockscreenService";
-    private int mServiceStartId = 0;
     private Context mContext = null;
-    int count=0;
+
     SharedPreference sharedPreference = new SharedPreference();
-    private NotificationManager mNM;
+
 
     NotiBinder notiBinder = new NotiBinder();
+
+    @Override
+    public void onLocationChanged(Location location) {
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        sharedPreference.putLocation(this,"lat",latitude);
+        sharedPreference.putLocation(this,"long", longitude);
+
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+
+    }
 
     public class NotiBinder extends Binder {
         public LockscreenService getService(){
@@ -101,17 +131,23 @@ public class LockscreenService extends Service{
     public void onCreate() {
         super.onCreate();
         mContext = this;
-        mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-        //activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        mServiceStartId = startId;
         stateRecever(true);
+        requestLocation();
 
         return LockscreenService.START_STICKY;
+    }
+
+    public double getLongitude(){
+        return sharedPreference.getLocationValue(this,"long");
+    }
+    public double getLatitude(){
+        return sharedPreference.getLocationValue(this,"lat");
     }
 
 
@@ -124,7 +160,7 @@ public class LockscreenService extends Service{
     @Override
     public void onDestroy() {
         stateRecever(false);
-        mNM.cancel(((LockApplication) getApplication()).notificationId);
+
     }
 
     private void startLockscreenActivity() {
@@ -136,8 +172,8 @@ public class LockscreenService extends Service{
     }
 
     private void destroyActivity(){
-        if(LockApplication.activities.size()>0){
-            for(AppCompatActivity activity: LockApplication.activities){
+        if(LockApplication.activities.size()>0) {
+            for (AppCompatActivity activity : LockApplication.activities) {
                 activity.finish();
             }
         }
@@ -173,5 +209,16 @@ public class LockscreenService extends Service{
 
     public void setDate(Date date) {
         saveDate(date);
+    }
+
+    private void requestLocation(){
+
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }else{
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1000*60*60*3,1000,this);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,100*60*60*3,1000,this);
+        }
+
     }
 }

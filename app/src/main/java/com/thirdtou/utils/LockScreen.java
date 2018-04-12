@@ -37,13 +37,6 @@ public class LockScreen {
 
     }
 
-    /*private void showSettingAccesability(){
-        if(!isMyServiceRunning(LockWindowAccessibilityService.class)) {
-            Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-            context.startActivity(intent);
-        }
-    }*/
-
     public void active(){
 
         if(context!=null) {

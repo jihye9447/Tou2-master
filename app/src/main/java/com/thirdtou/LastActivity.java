@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,7 +26,7 @@ import java.util.Locale;
  * Created by Administrator on 2018-02-20.
  */
 
-public class LastActivity extends AppCompatActivity {
+public class LastActivity extends AppCompatActivity implements View.OnClickListener {
 
 
     //TextView textView;
@@ -35,6 +36,7 @@ public class LastActivity extends AppCompatActivity {
     Typeface font1,font2,font3,font4,font5;
     SharedPreference sharedPreference=new SharedPreference();
     UserData userData;
+    Button startButton;
 
 
     @SuppressLint("HandlerLeak")
@@ -47,7 +49,7 @@ public class LastActivity extends AppCompatActivity {
         setTypeFace();
         getData();
         username.setText(user_name);
-        LockScreen.getInstance().init(this);
+        LockScreen.getInstance().init(getApplicationContext());
         checkPermission();
 
 
@@ -79,6 +81,8 @@ public class LastActivity extends AppCompatActivity {
         date = findViewById(R.id.date);
         month = findViewById(R.id.month);
         year = findViewById(R.id.year);
+        startButton = findViewById(R.id.button_start);
+        startButton.setOnClickListener(this);
 
         username = findViewById(R.id.username);
 
@@ -87,6 +91,8 @@ public class LastActivity extends AppCompatActivity {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
+        Toast.makeText(this,"START버튼을 클릭 후 잠금 버튼을 눌렀다가 해지해주세요.",Toast.LENGTH_LONG).show();
 
     }
 
@@ -185,30 +191,19 @@ public class LastActivity extends AppCompatActivity {
     }
 
 
-    public void exitButton(View view) {
-        if(R.id.button_exit == view.getId()){
-            //서비스-> 알람메니저 / 렌덤함수로 알람시간 지정(24시간 주기) / notification 띄우기 /
-            //날씨 데이터 업뎃 해서 / 생일 /생일 제외한 비오는날 / 비안오는날
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.button_start:
+                //서비스-> 알람메니저 / 렌덤함수로 알람시간 지정(24시간 주기) / notification 띄우기 /
+                //날씨 데이터 업뎃 해서 / 생일 /생일 제외한 비오는날 / 비안오는날
 
-           /* for (AppCompatActivity activity : LockApplication.activities){
-                activity.finish();
-                LockApplication.activities.clear();
-            }*/
+                //Toast.makeText(this,"잠금 버튼을 눌렀다가 해지해주세요.",Toast.LENGTH_LONG).show();
+                finish();
 
-            Toast.makeText(this,"잠금 버튼을 눌렀다가 해지해주세요.",Toast.LENGTH_LONG).show();
-            LockScreen.getInstance().active();
-            finish();
-
-
-            //LockScreen 활성화 시키기
-
-
-            //Intent intent = new Intent(getApplicationContext(),NotificationExampleActivity.class);
-            //NotiService 호출하기 위한 준비
-            //NotiScreenService notiScreenService = new NotiScreenService();
-            //notiScreenService.startService(intent);
-
+                LockScreen.getInstance().active();
+                //LockScreen 활성화 시키기
+                break;
         }
     }
-
 }

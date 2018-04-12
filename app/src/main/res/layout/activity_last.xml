@@ -176,7 +176,7 @@
         </LinearLayout>
     </RelativeLayout>
     <Button
-        android:id="@+id/button_exit"
+        android:id="@+id/button_start"
         android:layout_width="216.67dp"
         android:layout_height="38dp"
         android:layout_marginBottom="33.33dp"
@@ -185,6 +185,5 @@
         android:letterSpacing="0.2"
         android:background="@drawable/buttonshape"
         android:textColor="@color/colorWhite"
-        android:textSize="13.33dp"
-        android:onClick="exitButton"/>
+        android:textSize="13.33dp" />
 </LinearLayout>

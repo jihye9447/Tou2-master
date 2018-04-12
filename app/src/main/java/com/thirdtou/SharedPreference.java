@@ -98,6 +98,15 @@ public class SharedPreference {
         editor.putInt(key, value);
         editor.apply();
     }
+
+    public void putLocation(Context context,String key, double value) {
+        SharedPreferences pref = context.getSharedPreferences(PREF_NAME,
+                MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+
+        editor.putString(key, String.valueOf(value));
+        editor.apply();
+    }
     public void remove(Context context){
         SharedPreferences pref = context.getSharedPreferences(PREF_NAME,MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
@@ -131,6 +140,18 @@ public class SharedPreference {
             return pref.getString(key, dftValue);
         } catch (Exception e) {
             return dftValue;
+        }
+
+    }
+
+    public double getLocationValue(Context context,String key) {
+        SharedPreferences pref = context.getSharedPreferences(PREF_NAME,
+                MODE_PRIVATE);
+
+        try {
+            return Double.parseDouble(pref.getString(key, null));
+        } catch (Exception e) {
+            return 0;
         }
 
     }

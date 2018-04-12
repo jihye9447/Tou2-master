@@ -18,6 +18,7 @@ import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -55,7 +56,7 @@ import static android.view.View.GONE;
  * Created by Administrator on 2018-02-27.
  */
 
-public class NotificationExampleActivity extends AppCompatActivity implements View.OnClickListener, ServiceConnection, LocationListener{
+public class NotificationExampleActivity extends AppCompatActivity implements View.OnClickListener, ServiceConnection, LocationListener {
 
 
     //loading 화면
@@ -127,6 +128,18 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
         LockApplication.activities.add(this);
         requestLocation();
 
+    }
+
+    private void getLocation() {
+
+        double latitude = service.getLatitude();
+        double longitude = service.getLongitude();
+
+        if (latitude != 0 && longitude != 0) {
+            getWeather(latitude, longitude);
+        } else {
+            requestLocation();
+        }
 
     }
 
@@ -143,18 +156,18 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
                 timeHandler.obtainMessage().sendToTarget();
             }
         };
-        timer.schedule(timerTask, 0, 10 * 1000);
+        timer.schedule(timerTask, 0, 5 * 1000);
 
     }
 
-    private void requestLocation(){
+    private void requestLocation() {
 
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     0);
-        }else{
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,500,1,this);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,500,1,this);
+        } else {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 1, this);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 1, this);
         }
 
     }
@@ -187,13 +200,14 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
         });
 
         button_touch.setOnClickListener(this);
-        if(this.isFinishing()){
+        if (this.isFinishing()) {
             return;
-        }else {
-            Glide.with(this).load(R.drawable.gradiant).into(background);
+        } else {
+            Glide.with(this).load(R.drawable.noti_gradiant).into(background);
             Glide.with(this).load(R.drawable.tou_icon).into(loadingImage);
         }
     }
+
     /**
      *
      */
@@ -284,9 +298,9 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
     }
 
     private void setImage(int resource, boolean b) {
-        if(this.isFinishing()){
+        if (this.isFinishing()) {
             return;
-        }else {
+        } else {
             loadingImage.setVisibility(View.GONE);
             loading_txt.setVisibility(View.GONE);
             Glide.with(this).load(resource).into(weatherIcon);
@@ -309,7 +323,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
     protected void onResume() {
         super.onResume();
         ((LockApplication) getApplication()).lockScreenShow = true;
-        bindService(new Intent(this, LockscreenService.class),this,BIND_AUTO_CREATE);
+        bindService(new Intent(this, LockscreenService.class), this, BIND_AUTO_CREATE);
 
     }
 
@@ -322,7 +336,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
 
     //날씨 정보 받아오는 코드
     private void getWeather(double latitude, double longtitude) {
-        Log.d("event123","long"+ longtitude+"lat"+latitude);
+        Log.d("event123", "long" + longtitude + "lat" + latitude);
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient client = new OkHttpClient.Builder()
@@ -338,25 +352,32 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
             public void onResponse(Call<MinutelyWeather> call, Response<MinutelyWeather> response) {
 
                 if (response.isSuccessful()) {
-                    //날씨데이터를 받아옴
-                    MinutelyWeather object = response.body();
-                    String skyCode = object.getWeather().getMinutely().get(0).getSky().getCode();
-                    String temper = object.getWeather().getMinutely().get(0).getTemperature().getTc();
+                    if (response.body() != null) {
+                        //날씨데이터를 받아옴
+                        MinutelyWeather object = response.body();
+                        String skyCode = object.getWeather().getMinutely().get(0).getSky().getCode();
+                        String temper = object.getWeather().getMinutely().get(0).getTemperature().getTc();
 
-                    float temp1 = Float.parseFloat(temper);
-                    float result = Math.round(temp1 * 10f) / 10f;
-                    temper = String.valueOf(result + "C");
+                        //온도가 null 로오네요
+                        float temp1 = 0f;
+                        if (!TextUtils.isEmpty(temper)) {
+                            temp1 = Float.parseFloat(temper);
+                            float result = Math.round(temp1 * 10f) / 10f;
+                            temper = String.valueOf(result + "C");
+                            celcious.setText(temper);
+                        } else {
+                            //온도가 null 일때 세팅해주세요
+                            celcious.setText("온도 받기 실패");
+                        }
 
-                    if (object != null) {
                         //데이터가 null이 아니면 날씨 데이터 텍스트 뷰로 보여주기
                         //setCurrent_time();
                         setBackground(skyCode);
-                        celcious.setText(temper);
+
                         setWeatherIcon(skyCode);
 
                     }
                 }
-
 
             }
 
@@ -401,46 +422,42 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
             Resources res = getResources();
             String[] specialImgs = res.getStringArray(R.array.specialday);
 
-            /*if (todaySt.equals(specialDay[0])) {
-                if(this.isFinishing()){
+            if (todaySt.equals(specialDay[0])) {
+                if (this.isFinishing()) {
                     return;
-                }else {
+                } else {
                     Glide.with(this).load(specialImgs[0]).into(background);
                 }
             } else if (todaySt.equals(specialDay[1])) {
-                if(this.isFinishing()){
+                if (this.isFinishing()) {
                     return;
-                }else {
+                } else {
                     Glide.with(this).load(specialImgs[1]).into(background);
                 }
             } else if (todaySt.equals(specialDay[2])) {
-                if(this.isFinishing()){
+                if (this.isFinishing()) {
                     return;
-                }else {
+                } else {
                     Glide.with(this).load(specialImgs[2]).into(background);
                 }
             } else if (todaySt.equals(specialDay[3])) {
-                if(this.isFinishing()){
+                if (this.isFinishing()) {
                     return;
-                }else {
+                } else {
                     Glide.with(this).load(specialImgs[3]).into(background);
                 }
-            } else if (todaySt.equals(specialDay[4])){
-                if(this.isFinishing()){
+            } else if (todaySt.equals(specialDay[4])) {
+                if (this.isFinishing()) {
                     return;
-                }else {
+                } else {
                     Glide.with(this).load(specialImgs[4]).into(background);
                 }
-            }
-            else {
+            } else {
                 setWeatherBackground(skyCode, thisMonth, today);
-            }*/
+            }
 
-            setWeatherBackground(skyCode, thisMonth, today);
         } catch (ParseException e) {
         }
-
-
     }
 
     private void setWeatherBackground(String skycode, String thisMonth, Date date) {
@@ -460,30 +477,32 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
         ranSepImgs = res.getStringArray(R.array.randomSep);
         ranDecImgs = res.getStringArray(R.array.randomDec);
 
-        if(checkdate == null) {
+        if (checkdate == null) {
             service.setDate(date);
             generateRandomNum();
-        }else{
+        } else {
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(checkdate);
             int checkDay = calendar.get(Calendar.DAY_OF_MONTH);
-            Log.d("event123","checkdate:"+ String.valueOf(checkDay));
+            Log.d("event123", "checkdate:" + String.valueOf(checkDay));
             calendar.setTime(date);
             int now = calendar.get(Calendar.DAY_OF_MONTH);
-            Log.d("event123","today:"+String.valueOf(now));
+            Log.d("event123", "today:" + String.valueOf(now));
 
-            if (checkDay!=now) {
+            if (checkDay != now) {
                 service.setDate(date);
-                generateRandomNum();
-            }else{
+                nextNumber();
+                Log.d("event123", "randomNumber: " + randomNum);
+            } else {
                 getRandomNumber();
             }
 
         }
         setImage(skycode, thisMonth);
     }
-    private void setImage(String skycode, String thisMonth){
+
+    private void setImage(String skycode, String thisMonth) {
 
         if (skycode.equals("SKY_A04") || skycode.equals("SKY_A08") || skycode.equals("SKY_A06") ||
                 skycode.equals("SKY_A10") || skycode.equals("SKY_A12") || skycode.equals("SKY_A14")) {
@@ -525,23 +544,23 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
             } else if (thisMonth.equals("Nov")) {
 
                 setImage(ranOctImgs[randomNumNov]);
-            } else if (thisMonth.equals("Dec")){
+            } else if (thisMonth.equals("Dec")) {
 
                 setImage(ranDecImgs[randomNumDec]);
             } else {
-                if(randomNum == 0) {
+                if (randomNum == 0) {
                     content1.setText(user_name + "님");
                     content2.setText("멋진 하루 보내세요.");
-                }else if(randomNum == 1){
+                } else if (randomNum == 1) {
                     content1.setText(user_name + "님 충분히 잘 하고 있어요.");
                     content2.setText("오늘도 화이팅.");
-                }else if(randomNum == 2){
+                } else if (randomNum == 2) {
                     content1.setText(user_name + "님");
                     content2.setText("이루고 싶은 무언가는 찾으셨나요");
-                }else if(randomNum == 3){
+                } else if (randomNum == 3) {
                     content1.setText(user_name + "님");
                     content2.setText("웃는 하루 되세요.");
-                }else if(randomNum == 4){
+                } else if (randomNum == 4) {
                     content1.setText(user_name + "님의");
                     content2.setText("멋진 날을 응원할게요.");
                 }
@@ -549,6 +568,72 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
                 setImage(ranImgs[randomNum]);
             }
         }
+
+    }
+
+    private void nextNumber() {
+        getRandomNumber();
+
+        rainyNum++;
+        randomNum++;
+        randomNumAug++;
+        randomNumMarch++;
+        randomNumMay++;
+        randomNumJuly++;
+        randomNumOct++;
+        randomNumNov++;
+        randomNumSep++;
+        randomNumDec++;
+
+        if (rainyImgs.length == rainyNum) {
+            rainyNum = 0;
+        }
+
+        if (ranImgs.length == randomNum) {
+            randomNum = 0;
+        }
+
+        if (ranAugImgs.length == randomNumAug) {
+            randomNumAug = 0;
+        }
+
+        if (ranMarchImgs.length == randomNumMarch) {
+            randomNumMarch = 0;
+        }
+
+        if (ranMayImgs.length == randomNumMay) {
+            randomNumMay = 0;
+        }
+
+        if (ranJulyImgs.length == randomNumJuly) {
+            randomNumJuly = 0;
+        }
+
+        if (ranOctImgs.length == randomNumOct) {
+            randomNumOct = 0;
+        }
+        if (ranNovImgs.length == randomNumNov) {
+            randomNumNov = 0;
+        }
+        if (ranSepImgs.length == randomNumSep) {
+            randomNumSep = 0;
+        }
+        if (ranDecImgs.length == randomNumDec) {
+            randomNumDec = 0;
+        }
+
+        randomNumber.setRainyNum(rainyNum);
+        randomNumber.setRandomNum(randomNum);
+        randomNumber.setRandomNumAug(randomNumAug);
+        randomNumber.setRandomNumMarch(randomNumMarch);
+        randomNumber.setRandomNumMay(randomNumMay);
+        randomNumber.setRandomNumJuly(randomNumJuly);
+        randomNumber.setRandomNumOct(randomNumOct);
+        randomNumber.setRandomNumNov(randomNumNov);
+        randomNumber.setRandomNumSep(randomNumSep);
+        randomNumber.setRandomNumDec(randomNumDec);
+
+        service.setRandomNumber(randomNumber);
 
     }
 
@@ -564,7 +649,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
         randomNumOct = random.nextInt(ranOctImgs.length - 1);
         randomNumNov = random.nextInt(ranNovImgs.length - 1);
         randomNumSep = random.nextInt(ranNovImgs.length - 1);
-        randomNumDec = random.nextInt(ranDecImgs.length-1);
+        randomNumDec = random.nextInt(ranDecImgs.length - 1);
         rainyNum = checkRandomNum(rainyNum, rainyImgs.length - 1);
         randomNumAug = checkRandomNum(randomNumAug, ranAugImgs.length - 1);
         randomNumMarch = checkRandomNum(randomNumMarch, ranMarchImgs.length - 1);
@@ -573,7 +658,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
         randomNumSep = checkRandomNum(randomNumSep, ranSepImgs.length - 1);
         randomNumOct = checkRandomNum(randomNumOct, ranOctImgs.length - 1);
         randomNumNov = checkRandomNum(randomNumNov, ranNovImgs.length - 1);
-        randomNumDec = checkRandomNum(randomNumDec,ranDecImgs.length-1);
+        randomNumDec = checkRandomNum(randomNumDec, ranDecImgs.length - 1);
         randomNum = checkRandomNum(randomNum, ranImgs.length - 1);
 
         randomNumber.setRainyNum(rainyNum);
@@ -622,9 +707,9 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
 
     private void setImage(String resource) {
 
-        if(this.isFinishing()){
+        if (this.isFinishing()) {
             return;
-        }else{
+        } else {
             Glide.with(this).load(resource).into(background);
         }
 
@@ -652,9 +737,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
 
             startRealTimeTimer();
             setIcon();
-
-
-
+            getLocation();
 
         }
     }
@@ -669,8 +752,13 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
 
         latitude = location.getLatitude();
         longitude = location.getLongitude();
-        getWeather(latitude,longitude);
+
+        Log.d("event123", "long: " + latitude);
+        sharedPreference.putLocation(this, "lat", latitude);
+        sharedPreference.putLocation(this, "long", longitude);
+        getWeather(latitude, longitude);
         locationManager.removeUpdates(this);
+
 
     }
 
@@ -719,4 +807,3 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
         }
     }
 }
-

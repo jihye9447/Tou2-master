@@ -44,7 +44,6 @@
             android:layout_width="21.33dp"
             android:layout_height="37dp"
             android:layout_centerHorizontal="true"/>
-
         <Button
             android:id="@+id/button_save"
             android:letterSpacing="0.2"
@@ -58,5 +57,4 @@
             android:textColor="@color/colorWhite"
             android:textSize="13.33dp" />
     </RelativeLayout>
-
 </RelativeLayout>

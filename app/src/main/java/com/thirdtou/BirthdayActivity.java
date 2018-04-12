@@ -24,7 +24,7 @@ public class BirthdayActivity extends AppCompatActivity {
 
     //위젯 삽입
     UserData userData;
-    TextView birthday;
+    TextView birthday,title;
     String user_name;
     Button next,reset,birth_edit;
     Typeface typeface1, typeface2;
@@ -54,6 +54,7 @@ public class BirthdayActivity extends AppCompatActivity {
         reset.setOnClickListener(nextButtonClick);
         next = findViewById(R.id.button_next);
         next.setOnClickListener(nextButtonClick);
+        title = findViewById(R.id.logo_design);
 
     }
     public void setTypeface(){
@@ -67,6 +68,8 @@ public class BirthdayActivity extends AppCompatActivity {
         birthday.setShadowLayer(10,0,0, Color.WHITE);
 
         colorH = ContextCompat.getColor(this,R.color.colorHint);
+
+        title.setTypeface(typeface1);
 
     }
     Button.OnClickListener dateButtonClick = new Button.OnClickListener(){
@@ -142,12 +145,12 @@ public class BirthdayActivity extends AppCompatActivity {
             birth_edit.setBackground(null);
             birth_edit.setTextColor(Color.WHITE);
             birth_edit.setGravity(Gravity.CENTER);
+            birth_edit.setBackgroundColor(Color.parseColor("#00FFFFFF"));
             birth_edit.setShadowLayer(10,0,0,Color.WHITE);
             Typeface jeju = Typeface.createFromAsset(getAssets(),"fonts/jejug.ttf");
             birth_edit.setTypeface(jeju);
             birth_edit.setText(BirthMonth+"월 "+Days+"일");
             birth_edit.setTextSize((float)18.33);
-
 
         }
     }
