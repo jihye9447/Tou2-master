@@ -12,6 +12,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -98,7 +99,7 @@ public class BirthdayActivity extends AppCompatActivity {
                     }
                     LockApplication.activities.clear();
                 }else{
-                    //Toast.makeText(BirthdayActivity.this,"생일 입력해주세요",Toast.LENGTH_LONG).show();
+                    Toast.makeText(BirthdayActivity.this,"생일 입력해주세요",Toast.LENGTH_LONG).show();
                 }
 
 

@@ -1,16 +1,11 @@
 package com.thirdtou;
 
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.thirdtou.utils.LockScreen;
 
 /**
  * Created by Administrator on 2018-04-16.
@@ -29,7 +24,7 @@ public class ViewPagerActivity extends AppCompatActivity {
         viewPager = findViewById(R.id.view_pager);
         adapter = new ExplainLayoutAdapter(this);
         viewPager.setAdapter(adapter);
-        Button button = findViewById(R.id.button_explain);
+        TextView textView = findViewById(R.id.button_explain);
     }
 
     private boolean getLogin(){return(sharedPreference.getValue(this, "isLogin", false));}

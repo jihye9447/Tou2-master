@@ -1,10 +1,7 @@
 package com.thirdtou.utils;
 
-import android.app.ActivityManager;
-import android.app.NotificationManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -14,25 +11,17 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatImageView;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.thirdtou.ChecknameActivity;
 import com.thirdtou.LockApplication;
 import com.thirdtou.NotificationExampleActivity;
 import com.thirdtou.SharedPreference;
 
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.locks.Lock;
 
 /**
  * Created by Administrator on 2018-03-01.
@@ -216,8 +205,12 @@ public class LockscreenService extends Service implements LocationListener{
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }else{
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1000*60*60*3,1000,this);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,100*60*60*3,1000,this);
+            if (locationManager.getAllProviders().contains(LocationManager.GPS_PROVIDER)){
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 1, this);
+            }
+            if (locationManager.getAllProviders().contains(LocationManager.NETWORK_PROVIDER)){
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 1, this);
+            }
         }
 
     }

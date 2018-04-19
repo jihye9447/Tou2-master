@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 
 import java.util.ArrayList;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+
 /**
  * Created by Administrator on 2018-03-01.
  */
@@ -18,6 +20,10 @@ public class LockApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/Roboto-RobotoRegular.ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build());
     }
 
 }

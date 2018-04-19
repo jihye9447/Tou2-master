@@ -13,8 +13,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-
-
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -49,8 +47,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
-import static android.view.View.GONE;
 
 /**
  * Created by Administrator on 2018-02-27.
@@ -167,8 +163,12 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
                     0);
         } else {
             Log.d("event123","request Location");
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 1, this);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 1, this);
+            if (locationManager.getAllProviders().contains(LocationManager.GPS_PROVIDER)){
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 1, this);
+            }
+            if (locationManager.getAllProviders().contains(LocationManager.NETWORK_PROVIDER)){
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 1, this);
+            }
         }
 
     }

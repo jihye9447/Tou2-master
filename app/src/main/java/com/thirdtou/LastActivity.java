@@ -1,19 +1,20 @@
 package com.thirdtou;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.Intent;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.thirdtou.utils.LockScreen;
 
@@ -21,6 +22,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 /**
  * Created by Administrator on 2018-02-20.
@@ -37,12 +40,18 @@ public class LastActivity extends AppCompatActivity implements View.OnClickListe
     SharedPreference sharedPreference=new SharedPreference();
     UserData userData;
     Button startButton;
+    AssetManager assetManager;
+    ImageView colon;
 
-
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_last);
+        assetManager = getAssets();
 
         initView();
         setTypeFace();
@@ -80,9 +89,11 @@ public class LastActivity extends AppCompatActivity implements View.OnClickListe
         date = findViewById(R.id.date);
         month = findViewById(R.id.month);
         year = findViewById(R.id.year);
+        colon = findViewById(R.id.colon);
         startButton = findViewById(R.id.button_start);
         startButton.setOnClickListener(this);
 
+        Glide.with(this).load(R.drawable.colon).into(colon);
         username = findViewById(R.id.username);
 
         try {
@@ -145,25 +156,12 @@ public class LastActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setTypeFace() {
-        font1 = Typeface.createFromAsset(getAssets(), "fonts/smr.ttf");
-        font2 = Typeface.createFromAsset(getAssets(), "fonts/jejug.ttf");
-        font3 = Typeface.createFromAsset(getAssets(),"fonts/nanumgEX.ttf");
-        font4 = Typeface.createFromAsset(getAssets(),"fonts/nanumgL.ttf");
-        font5 = Typeface.createFromAsset(getAssets(),"fonts/nanumg.ttf");
 
-        SpannableStringBuilder SS = new SpannableStringBuilder("지금부터 TOU가");
-        SS.setSpan(new CustomTypefaceSpan("", font1), 0, 4, Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
-        SS.setSpan(new CustomTypefaceSpan("", font1), 8, 9, Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
-        SS.setSpan(new CustomTypefaceSpan("", font2), 5, 7, Spanned.SPAN_EXCLUSIVE_INCLUSIVE);
-        text1.setText(SS);
-        text2.setTypeface(font1);
+        font1 = Typeface.createFromAsset(assetManager, "fonts/smr.ttf");
+
+
         username.setTypeface(font1);
-        hour.setTypeface(font3);
-        min.setTypeface(font3);
-        month.setTypeface(font4);
-        date.setTypeface(font5);
-        day.setTypeface(font3);
-        year.setTypeface(font4);
+
     }
 
     private String convertLetter(String str){
@@ -196,7 +194,7 @@ public class LastActivity extends AppCompatActivity implements View.OnClickListe
                 //날씨 데이터 업뎃 해서 / 생일 /생일 제외한 비오는날 / 비안오는날
 
                 finish();
-
+                Toast.makeText(this,"된다 된다",Toast.LENGTH_LONG).show();
                 LockScreen.getInstance().active();
                 //LockScreen 활성화 시키기
                 break;
