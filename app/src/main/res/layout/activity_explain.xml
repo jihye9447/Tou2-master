@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/gradiant"
+    android:orientation="vertical">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="31dp">
+        <ImageView
+            android:id="@+id/close_imagebar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#943114"/>
+
+        <TextView
+            android:id="@+id/button_explain"
+            android:layout_width="70.33dp"
+            android:layout_height="match_parent"
+            android:background="#00943114"
+            android:layout_alignParentRight="true"
+            android:text="닫기"
+            android:letterSpacing="0.1"
+            android:textSize="15dp"
+            android:gravity="center"
+            android:textColor="@color/colorWhite"
+            android:onClick="onClick"/>
+
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="29dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="36.33dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/upper_text"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:letterSpacing="0.1"
+            android:layout_marginRight="1dp"
+            tools:text="실시간 업데이트 되는 날씨정보"
+            android:textColor="@color/colorWhite"
+            android:textSize="15dp" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="7dp" />
+
+        <TextView
+            android:id="@+id/lower_text"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginRight="1dp"
+            android:gravity="center_horizontal"
+            android:letterSpacing="0.1"
+            tools:text="매일 변하는 예쁜 잠금화면"
+            android:textColor="@color/colorWhite"
+            android:textSize="15dp" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ImageView
+            android:layout_marginBottom="89dp"
+            android:layout_above="@+id/empty_imageview"
+            android:id="@+id/explain1_gif"
+            android:layout_width="190dp"
+            android:layout_height="380dp"
+            android:layout_centerHorizontal="true"
+            />
+        <ImageView
+            android:layout_marginBottom="56dp"
+            android:layout_above="@+id/empty_imageview"
+            android:id="@+id/explain2_image"
+            android:layout_width="190dp"
+            android:layout_height="380dp"
+            android:layout_centerHorizontal="true"
+            />
+
+        <RelativeLayout
+            android:layout_above="@+id/empty_imageview"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_toLeftOf="@+id/center_circle"
+                android:layout_centerVertical="true"
+                android:id="@+id/left_circle"
+                android:layout_width="8dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/circle" />
+
+            <ImageView
+                android:id="@+id/center_circle"
+                android:layout_width="8dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:layout_height="match_parent"
+                android:layout_marginStart="9.33dp"
+                android:src="@drawable/circle" />
+
+            <ImageView
+                android:layout_toRightOf="@+id/center_circle"
+                android:layout_centerVertical="true"
+                android:id="@+id/right_circle"
+                android:layout_width="8dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="9.33dp"
+                android:src="@drawable/circle" />
+
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/empty_imageview"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:layout_alignParentBottom="true" />
+    </RelativeLayout>
+</LinearLayout>

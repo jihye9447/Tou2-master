@@ -22,23 +22,27 @@
                 android:textColor="@color/colorWhite"
                 android:textSize="16dp"
                 />
+
             <EditText
                 android:id="@+id/input_name"
                 android:layout_width="239.67dp"
                 android:layout_height="37dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="18dp"
                 android:background="@drawable/edittextshape"
-                android:maxLines="1"
-                android:letterSpacing="0.2"
-                android:paddingTop="0.33dp"
-                android:hint="이름을 입력하세요."
-                android:textColorHint="@color/colorHint"
-                android:textColor="@color/colorHint"
                 android:gravity="center"
+                android:hint="이름을 입력하세요."
+                android:letterSpacing="0.2"
+                android:maxLines="1"
                 android:padding="10dp"
                 android:paddingLeft="15dp"
-                android:textSize="13dp"
-                android:singleLine="true"/>
+                android:paddingTop="0.33dp"
+                android:singleLine="true"
+                android:textColor="@color/colorHint"
+                android:textColorHint="@color/colorHint"
+                android:textSize="13dp" />
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

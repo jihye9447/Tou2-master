@@ -113,9 +113,9 @@ public class LoadingActivity extends AppCompatActivity implements Runnable,Versi
             alertDialog.show();
         } else {
             if (getLogin()) {
-                goNext(LastActivity.class);
+                goNext(ViewPagerActivity.class);
             } else {
-                goNext(MainActivity.class);
+                goNext(ViewPagerActivity.class);
             }
         }
     }

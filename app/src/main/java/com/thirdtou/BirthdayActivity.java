@@ -12,7 +12,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -91,7 +90,6 @@ public class BirthdayActivity extends AppCompatActivity {
 
                 if(!birth_edit.getText().equals("")){
                 next.setShadowLayer(10,0,0, Color.WHITE);
-                    Toast.makeText(BirthdayActivity.this, "생일 축하 메세지를 lockscreen으로 띄워줍니다.", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent(getApplicationContext(),LastActivity.class);
                 saveUserData();
                 startActivity(intent);
@@ -100,7 +98,7 @@ public class BirthdayActivity extends AppCompatActivity {
                     }
                     LockApplication.activities.clear();
                 }else{
-                    Toast.makeText(BirthdayActivity.this,"생일 입력해주세요",Toast.LENGTH_LONG).show();
+                    //Toast.makeText(BirthdayActivity.this,"생일 입력해주세요",Toast.LENGTH_LONG).show();
                 }
 
 

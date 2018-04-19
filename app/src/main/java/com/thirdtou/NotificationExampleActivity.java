@@ -166,6 +166,7 @@ public class NotificationExampleActivity extends AppCompatActivity implements Vi
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     0);
         } else {
+            Log.d("event123","request Location");
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 1, this);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 1, this);
         }

@@ -2,6 +2,7 @@ package com.thirdtou;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -12,7 +13,6 @@ import android.text.Spanned;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.thirdtou.utils.LockScreen;
@@ -39,7 +39,6 @@ public class LastActivity extends AppCompatActivity implements View.OnClickListe
     Button startButton;
 
 
-    @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,8 +90,6 @@ public class LastActivity extends AppCompatActivity implements View.OnClickListe
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
-        Toast.makeText(this,"START버튼을 클릭 후 잠금 버튼을 눌렀다가 해지해주세요.",Toast.LENGTH_LONG).show();
 
     }
 
@@ -167,8 +164,8 @@ public class LastActivity extends AppCompatActivity implements View.OnClickListe
         date.setTypeface(font5);
         day.setTypeface(font3);
         year.setTypeface(font4);
-
     }
+
     private String convertLetter(String str){
 
         if (str.equals("MON")) {
@@ -198,7 +195,6 @@ public class LastActivity extends AppCompatActivity implements View.OnClickListe
                 //서비스-> 알람메니저 / 렌덤함수로 알람시간 지정(24시간 주기) / notification 띄우기 /
                 //날씨 데이터 업뎃 해서 / 생일 /생일 제외한 비오는날 / 비안오는날
 
-                //Toast.makeText(this,"잠금 버튼을 눌렀다가 해지해주세요.",Toast.LENGTH_LONG).show();
                 finish();
 
                 LockScreen.getInstance().active();
