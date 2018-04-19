@@ -93,7 +93,7 @@ public class LastActivity extends AppCompatActivity implements View.OnClickListe
         startButton = findViewById(R.id.button_start);
         startButton.setOnClickListener(this);
 
-        Glide.with(this).load(R.drawable.colon).into(colon);
+        Glide.with(this).load(R.drawable.colon_vector).into(colon);
         username = findViewById(R.id.username);
 
         try {
